@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">MedMemo</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="welcome">Welcome</string>
+    <string name="please_sign_in_to_continue">Please sign in, to continue</string>
+    <string name="e_mail">E-mail</string>
+    <string name="login">Login</string>
+    <string name="sing_up">Sing up</string>
+    <string name="password">Password</string>
+    <string name="don_t_have_account">Don\'t have account?</string>
 </resources>
