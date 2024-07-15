@@ -27,10 +27,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.szylas.medmemo.R
 import com.szylas.medmemo.ui.components.AppLogo
+import com.szylas.medmemo.ui.components.PasswordInput
 import com.szylas.medmemo.ui.components.PrimaryButton
 import com.szylas.medmemo.ui.components.TextInput
-import com.szylas.medmemo.ui.theme.TextStyleOption
-import com.szylas.medmemo.ui.theme.TextStyleProvider
+import com.szylas.medmemo.ui.common.TextStyleOption
+import com.szylas.medmemo.ui.common.TextStyleProvider
 import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 
@@ -142,14 +143,14 @@ class RegisterActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            TextInput(
+            PasswordInput(
                 value = password.value,
                 label = stringResource(R.string.password),
                 onValueChange = { password.value = it },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            TextInput(
+            PasswordInput(
                 value = repeatPassword.value,
                 label = stringResource(R.string.repeatPassword),
                 onValueChange = { repeatPassword.value = it },

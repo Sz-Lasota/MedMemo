@@ -33,8 +33,8 @@ import com.szylas.medmemo.ui.components.PasswordInput
 import com.szylas.medmemo.ui.components.PrimaryButton
 import com.szylas.medmemo.ui.components.SecondaryButton
 import com.szylas.medmemo.ui.components.TextInput
-import com.szylas.medmemo.ui.theme.TextStyleOption
-import com.szylas.medmemo.ui.theme.TextStyleProvider
+import com.szylas.medmemo.ui.common.TextStyleOption
+import com.szylas.medmemo.ui.common.TextStyleProvider
 import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 
@@ -104,6 +104,7 @@ class LoginActivity : ComponentActivity() {
             PrimaryButton(
                 text = stringResource(R.string.login), onClick = {
                     Toast.makeText(this@LoginActivity, password.value, Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                 }, modifier = Modifier.fillMaxWidth()
             )
             Text(

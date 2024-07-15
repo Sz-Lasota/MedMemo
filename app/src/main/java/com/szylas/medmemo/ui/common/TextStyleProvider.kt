@@ -1,4 +1,4 @@
-package com.szylas.medmemo.ui.theme
+package com.szylas.medmemo.ui.common
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable

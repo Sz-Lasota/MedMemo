@@ -18,6 +18,11 @@
             android:label="@string/registeractivity"
             android:theme="@style/Theme.MedMemo" />
         <activity
+            android:name=".ui.MainActivity"
+            android:exported="false"
+            android:label="@string/mainactivity"
+            android:theme="@style/Theme.MedMemo" />
+        <activity
             android:name="com.szylas.medmemo.ui.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_main"

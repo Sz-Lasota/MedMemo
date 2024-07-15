@@ -11,4 +11,5 @@
     <string name="registeractivity">RegisterActivity</string>
     <string name="name">Name</string>
     <string name="repeatPassword">Repeat password</string>
+    <string name="mainactivity">MainActivity</string>
 </resources>
