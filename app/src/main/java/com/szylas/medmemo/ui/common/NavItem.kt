@@ -6,3 +6,9 @@ data class NavBarItem(
     val selectedIcon: Int,
     val unselectedIcon: Int
 )
+
+data class NavDrawerItem(
+    val destination: Class<*>,
+    val label: String,
+    val icon: Int,
+)

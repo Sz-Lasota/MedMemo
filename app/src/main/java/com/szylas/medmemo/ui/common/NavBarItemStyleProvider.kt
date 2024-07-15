@@ -10,9 +10,9 @@ object NavBarItemStyleProvider {
     @Composable
     fun provide(): NavigationBarItemColors {
         return NavigationBarItemColors(
-            selectedIconColor = MaterialTheme.colorScheme.onSecondary,
+            selectedIconColor = MaterialTheme.colorScheme.onSurface,
             selectedTextColor = MaterialTheme.colorScheme.onSecondary,
-            selectedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+            selectedIndicatorColor = MaterialTheme.colorScheme.surface,
             unselectedIconColor = MaterialTheme.colorScheme.outline,
             unselectedTextColor = MaterialTheme.colorScheme.outline,
             disabledIconColor = MaterialTheme.colorScheme.primary,
