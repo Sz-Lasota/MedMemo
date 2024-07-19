@@ -1,4 +1,4 @@
-package com.szylas.medmemo.ui.common
+package com.szylas.medmemo.common.presentation.models
 
 data class NavBarItem(
     val destination: Any,

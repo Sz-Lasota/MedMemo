@@ -14,3 +14,6 @@ val AppBarWhite = Color(0xffDCDCDC)
 val Black = Color(0xff000000)
 val White = Color(0xffffffff)
 val DimBlue = Color(0xff9DB2CE)
+
+val LightGray = Color(0xff555555)
+val LighterGray = Color(0xffaaaaaa)

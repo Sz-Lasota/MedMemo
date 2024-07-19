@@ -1,4 +1,4 @@
-package com.szylas.medmemo.ui.components
+package com.szylas.medmemo.common.presentation.components
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions

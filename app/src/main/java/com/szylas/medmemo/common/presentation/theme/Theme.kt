@@ -21,7 +21,8 @@ private val DarkColorScheme = darkColorScheme(
     outline = DimBlue,
     surfaceDim = DimBlue,
     onSurface = AppBarWhite,
-    surface = AppBarBlack
+    surface = AppBarBlack,
+    surfaceVariant = LightGray
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -35,7 +36,9 @@ private val LightColorScheme = lightColorScheme(
     outline = DimBlue,
     surfaceDim = DarkerBlue,
     onSurface = AppBarBlack,
-    surface = AppBarWhite
+    surface = AppBarWhite,
+    surfaceVariant = LighterGray
+
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),

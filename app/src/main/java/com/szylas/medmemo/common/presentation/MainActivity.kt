@@ -1,4 +1,4 @@
-package com.szylas.medmemo.ui
+package com.szylas.medmemo.common.presentation
 
 import android.content.Intent
 import android.graphics.Color
@@ -50,12 +50,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.szylas.medmemo.R
-import com.szylas.medmemo.ui.common.CalendarScreen
-import com.szylas.medmemo.ui.common.HomeScreen
-import com.szylas.medmemo.ui.common.NavBarItem
-import com.szylas.medmemo.ui.common.NavBarItemStyleProvider
-import com.szylas.medmemo.ui.common.NavDrawerItem
-import com.szylas.medmemo.ui.common.StatisticsScreen
+import com.szylas.medmemo.auth.presentation.LoginActivity
+import com.szylas.medmemo.common.presentation.models.CalendarScreen
+import com.szylas.medmemo.common.presentation.models.HomeScreen
+import com.szylas.medmemo.common.presentation.models.NavBarItem
+import com.szylas.medmemo.common.presentation.style.NavBarItemStyleProvider
+import com.szylas.medmemo.common.presentation.models.NavDrawerItem
+import com.szylas.medmemo.common.presentation.models.StatisticsScreen
+import com.szylas.medmemo.common.presentation.views.CalendarFragment
+import com.szylas.medmemo.common.presentation.views.HomeFragment
 import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 import kotlinx.coroutines.launch
@@ -174,7 +177,9 @@ class MainActivity : ComponentActivity() {
                             title = {
                             Text(
                                 text = stringResource(id = R.string.app_name),
-                                modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surface),
                                 textAlign = TextAlign.Center,
                                 fontWeight = FontWeight.Medium,
                             )
@@ -219,10 +224,10 @@ class MainActivity : ComponentActivity() {
                         ) {
                             NavHost(navController = navController, startDestination = HomeScreen) {
                                 composable<HomeScreen> {
-                                    Text(text = "Home")
+                                    HomeFragment(activity = this@MainActivity)
                                 }
                                 composable<CalendarScreen> {
-                                    Text(text = "Calendar")
+                                    CalendarFragment(activity = this@MainActivity)
                                 }
                                 composable<StatisticsScreen> {
                                     Text(text = "Stats")

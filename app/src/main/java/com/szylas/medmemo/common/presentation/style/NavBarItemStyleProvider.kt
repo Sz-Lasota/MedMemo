@@ -1,4 +1,4 @@
-package com.szylas.medmemo.ui.common
+package com.szylas.medmemo.common.presentation.style
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItemColors

@@ -1,4 +1,4 @@
-package com.szylas.medmemo.ui.common
+package com.szylas.medmemo.common.presentation.style
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -6,7 +6,7 @@ import androidx.compose.ui.text.TextStyle
 
 
 enum class TextStyleOption {
-    LABEL_MEDIUM, TITLE_LARGE
+    LABEL_MEDIUM, TITLE_LARGE, LABEL_LARGE, LABEL_SMALL
 }
 
 object TextStyleProvider {
@@ -25,6 +25,18 @@ object TextStyleProvider {
                 fontFamily = MaterialTheme.typography.titleLarge.fontFamily,
                 fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
                 fontSize = MaterialTheme.typography.titleLarge.fontSize
+            )
+            TextStyleOption.LABEL_LARGE -> TextStyle(
+                fontStyle = MaterialTheme.typography.labelLarge.fontStyle,
+                fontFamily = MaterialTheme.typography.labelLarge.fontFamily,
+                fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
+                fontSize = MaterialTheme.typography.labelLarge.fontSize
+            )
+            TextStyleOption.LABEL_SMALL -> TextStyle(
+                fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
+                fontFamily = MaterialTheme.typography.labelSmall.fontFamily,
+                fontWeight = MaterialTheme.typography.labelSmall.fontWeight,
+                fontSize = MaterialTheme.typography.labelSmall.fontSize
             )
         }
     }
