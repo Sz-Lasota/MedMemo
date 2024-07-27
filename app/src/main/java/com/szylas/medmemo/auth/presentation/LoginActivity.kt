@@ -35,7 +35,7 @@ import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.components.TextInput
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
-import com.szylas.medmemo.common.presentation.MainActivity
+import com.szylas.medmemo.main.presentation.MainActivity
 import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 

@@ -12,4 +12,5 @@
     <string name="name">Name</string>
     <string name="repeatPassword">Repeat password</string>
     <string name="mainactivity">MainActivity</string>
+    <string name="statistics">Statistics</string>
 </resources>

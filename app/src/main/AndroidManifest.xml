@@ -18,7 +18,7 @@
             android:label="@string/registeractivity"
             android:theme="@style/Theme.MedMemo" />
         <activity
-            android:name=".common.presentation.MainActivity"
+            android:name=".main.presentation.MainActivity"
             android:exported="false"
             android:label="@string/mainactivity"
             android:theme="@style/Theme.MedMemo" />

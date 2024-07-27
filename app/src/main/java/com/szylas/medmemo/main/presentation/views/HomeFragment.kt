@@ -1,4 +1,4 @@
-package com.szylas.medmemo.common.presentation.views
+package com.szylas.medmemo.main.presentation.views
 
 import android.widget.Toast
 import androidx.activity.ComponentActivity

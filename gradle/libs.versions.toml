@@ -23,6 +23,7 @@ navigationCompose = "2.7.7"
 #noinspection GradleDependency
 composeNavigation = "2.8.0-alpha08"
 serialization = "1.6.3"
+ycharts = "2.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,6 +45,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
+ycharts = { module = "co.yml:ycharts", version.ref = "ycharts" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

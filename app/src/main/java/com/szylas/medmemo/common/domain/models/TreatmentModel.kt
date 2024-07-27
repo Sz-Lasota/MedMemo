@@ -1,4 +1,4 @@
-package com.szylas.medmemo.common.presentation.models
+package com.szylas.medmemo.common.domain.models
 
 import java.text.DecimalFormat
 import java.text.NumberFormat

@@ -1,4 +1,4 @@
-package com.szylas.medmemo.common.datastore.viewhelpers
+package com.szylas.medmemo.calendar.domain
 
 import java.util.Calendar
 

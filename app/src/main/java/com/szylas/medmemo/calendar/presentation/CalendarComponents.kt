@@ -1,4 +1,4 @@
-package com.szylas.medmemo.common.presentation.views
+package com.szylas.medmemo.calendar.presentation
 
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -21,7 +20,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,79 +32,45 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.szylas.medmemo.common.datastore.viewhelpers.generateDates
-import com.szylas.medmemo.common.presentation.models.TreatmentModel
-import com.szylas.medmemo.common.presentation.models.TreatmentScheduleItem
+import com.szylas.medmemo.calendar.domain.generateDates
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
+import com.szylas.medmemo.common.domain.models.TreatmentModel
+import com.szylas.medmemo.calendar.domain.models.TreatmentScheduleItem
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 
-val mock = listOf(
-    TreatmentModel("First", 1, 8 * 60 + 0),
-    TreatmentModel("Second", 2, 8 * 60 + 0),
-    TreatmentModel("First", 3, 9 * 60 + 0),
-    TreatmentModel("First", 1, 8 * 60 + 0),
-    TreatmentModel("First", 1, 9 * 60 + 30),
-    TreatmentModel("First", 1, 8 * 60 + 0),
-    TreatmentModel("First", 1, 8 * 60 + 0),
-    TreatmentModel("First", 1, 12 * 60 + 0),
-    TreatmentModel("First", 1, 20 * 60 + 45),
-).groupBy {
-    it.timeString()
-}.toSortedMap()
-
 @Composable
-fun CalendarFragment(activity: ComponentActivity) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top)
+fun DayCarousel(activity: ComponentActivity) {
+    var selectedIndex by rememberSaveable {
+        mutableIntStateOf(0)
+    }
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(15.dp)
     ) {
-        var selectedIndex by rememberSaveable {
-            mutableIntStateOf(0)
-        }
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(15.dp)
-        ) {
 
-            val start = Calendar.getInstance()
-            itemsIndexed(generateDates(start, 14)) { index, it ->
-                DateTile(
-                    day = it.get(Calendar.DAY_OF_MONTH).toString(),
-                    month = SimpleDateFormat("MMM", Locale.getDefault()).format(it.getTime()),
-                    active = selectedIndex == index
-                ) {
-                    if (index == selectedIndex) {
-                        return@DateTile
-                    }
-                    Toast.makeText(
-                        activity, "Hello from: ${
-                            SimpleDateFormat(
-                                "DD-MMM", Locale.getDefault()
-                            ).format(it.time)
-                        }", Toast.LENGTH_SHORT
-                    ).show()
-                    selectedIndex = index
+        val start = Calendar.getInstance()
+        itemsIndexed(generateDates(start, 14)) { index, it ->
+            DateTile(
+                day = it.get(Calendar.DAY_OF_MONTH).toString(),
+                month = SimpleDateFormat("MMM", Locale.getDefault()).format(it.time),
+                active = selectedIndex == index
+            ) {
+                if (index == selectedIndex) {
+                    return@DateTile
                 }
+                Toast.makeText(
+                    activity, "Hello from: ${
+                        SimpleDateFormat(
+                            "dd-MMM", Locale.getDefault()
+                        ).format(it.time)
+                    }", Toast.LENGTH_SHORT
+                ).show()
+                selectedIndex = index
             }
-
         }
-        HorizontalDivider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(2.dp),
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        DaySchedule(activity = activity, modifier = Modifier.fillMaxWidth(), scheduledEvents = mock.map {
-            TreatmentScheduleItem(
-                time = it.key, events = it.value
-            )
-        })
 
     }
 }
@@ -124,7 +88,7 @@ fun DaySchedule(activity: ComponentActivity, scheduledEvents: List<TreatmentSche
                 EventHeader(eventTitle = eventPack.time, modifier = Modifier.fillMaxWidth())
             }
             items(eventPack.events) { event ->
-                    EventTile(activity = activity, event = event, modifier = Modifier.fillMaxWidth(0.9f))
+                EventTile(activity = activity, event = event, modifier = Modifier.fillMaxWidth(0.9f))
             }
         }
 

@@ -1,4 +1,4 @@
-package com.szylas.medmemo.common.presentation
+package com.szylas.medmemo.main.presentation
 
 import android.content.Intent
 import android.graphics.Color
@@ -51,14 +51,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.szylas.medmemo.R
 import com.szylas.medmemo.auth.presentation.LoginActivity
-import com.szylas.medmemo.common.presentation.models.CalendarScreen
-import com.szylas.medmemo.common.presentation.models.HomeScreen
-import com.szylas.medmemo.common.presentation.models.NavBarItem
+import com.szylas.medmemo.main.presentation.models.CalendarScreen
+import com.szylas.medmemo.main.presentation.models.HomeScreen
+import com.szylas.medmemo.main.presentation.models.NavBarItem
 import com.szylas.medmemo.common.presentation.style.NavBarItemStyleProvider
-import com.szylas.medmemo.common.presentation.models.NavDrawerItem
-import com.szylas.medmemo.common.presentation.models.StatisticsScreen
-import com.szylas.medmemo.common.presentation.views.CalendarFragment
-import com.szylas.medmemo.common.presentation.views.HomeFragment
+import com.szylas.medmemo.main.presentation.models.NavDrawerItem
+import com.szylas.medmemo.main.presentation.models.StatisticsScreen
+import com.szylas.medmemo.main.presentation.views.CalendarFragment
+import com.szylas.medmemo.main.presentation.views.HomeFragment
+import com.szylas.medmemo.main.presentation.views.StatisticsFragment
 import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 import kotlinx.coroutines.launch
@@ -230,7 +231,7 @@ class MainActivity : ComponentActivity() {
                                     CalendarFragment(activity = this@MainActivity)
                                 }
                                 composable<StatisticsScreen> {
-                                    Text(text = "Stats")
+                                    StatisticsFragment(activity = this@MainActivity)
                                 }
                             }
                         }
