@@ -1,4 +1,4 @@
-package com.szylas.medmemo.ui.components
+package com.szylas.medmemo.common.presentation.components
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -65,6 +65,40 @@ fun SecondaryButton(
         modifier = modifier,
         cornerRadius = cornerRadius
     )
+}
+
+@Composable
+fun BlockButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    cornerRadius: Dp = 25.dp,
+    height: Dp = 80.dp
+) {
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(cornerRadius),
+        modifier = modifier
+            .height(height),
+        colors = ButtonColors(
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            containerColor = MaterialTheme.colorScheme.primary,
+            disabledContentColor = MaterialTheme.colorScheme.tertiary,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceDim,
+        )
+    ) {
+        Text(
+            modifier = Modifier
+                .align(Alignment.CenterVertically),
+            text = text,
+            style = TextStyle(
+                fontStyle = MaterialTheme.typography.labelMedium.fontStyle,
+                fontSize = MaterialTheme.typography.labelMedium.fontSize,
+                fontFamily = MaterialTheme.typography.labelMedium.fontFamily,
+                fontWeight = MaterialTheme.typography.labelMedium.fontWeight,
+            ),
+        )
+    }
 }
 
 @Composable
