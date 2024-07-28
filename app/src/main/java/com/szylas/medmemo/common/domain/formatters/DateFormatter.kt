@@ -9,3 +9,9 @@ fun formatDate(calendar: Calendar) : String {
         "dd-MMM", Locale.getDefault()
     ).format(calendar.time)
 }
+
+fun formatFullDate(calendar: Calendar): String {
+    return SimpleDateFormat(
+        "dd/MMM/yyyy", Locale.getDefault()
+    ).format(calendar.time)
+}

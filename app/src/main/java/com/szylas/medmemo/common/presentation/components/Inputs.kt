@@ -18,15 +18,17 @@ fun TextInput(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 12.dp,
-    error: Boolean = false
+    error: Boolean = false,
+    singleLine: Boolean = true
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier,
         shape = RoundedCornerShape(cornerRadius),
+        maxLines = 3,
         isError = error,
-        singleLine = true,
+        singleLine = singleLine,
         label = { Text(text = label) }
     )
 }

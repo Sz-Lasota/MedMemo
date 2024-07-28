@@ -30,9 +30,14 @@ import com.szylas.medmemo.statistics.presentation.ChartTile
 
 val wantedStats = listOf(
     TimeStatistics(),
-    MissedStatistics()
+    MissedStatistics(),
+    TimeStatistics(),
+    MissedStatistics(),
+    TimeStatistics(),
+    MissedStatistics(),
 )
 
+@Suppress("UNUSED_PARAMETER")
 @Composable
 fun StatisticsFragment(activity: ComponentActivity) {
     Column(

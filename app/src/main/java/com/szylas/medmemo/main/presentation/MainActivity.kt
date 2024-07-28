@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -67,6 +69,11 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
 
     private val drawerNavItems = listOf(
+        NavDrawerItem(
+            destination = MainActivity::class.java,
+            label = "Home",
+            icon = R.drawable.home_filled
+        ),
         NavDrawerItem(
             destination = LoginActivity::class.java,
             label = "Settings",
@@ -131,41 +138,43 @@ class MainActivity : ComponentActivity() {
 
                 ModalNavigationDrawer(
                     drawerContent = {
-                    ModalDrawerSheet(
-                        drawerContainerColor = MaterialTheme.colorScheme.surface,
-                        drawerContentColor = MaterialTheme.colorScheme.tertiary,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(0.dp, 20.dp, 20.dp, 0.dp))
-                    ) {
-                        drawerNavItems.forEachIndexed { index, item ->
-                            NavigationDrawerItem(
-                                colors = NavigationDrawerItemDefaults.colors(
-                                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                                    selectedContainerColor = MaterialTheme.colorScheme.surface,
-                                    unselectedIconColor = MaterialTheme.colorScheme.surfaceDim,
-                                    unselectedTextColor = MaterialTheme.colorScheme.surfaceDim,
-                                ),
-                                label = { Text(text = item.label) },
-                                selected = index == selectedDrawerIndex,
-                                onClick = {
-                                    selectedDrawerIndex = index
+                        ModalDrawerSheet(
+                            drawerContainerColor = MaterialTheme.colorScheme.surface,
+                            drawerContentColor = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(0.dp, 20.dp, 20.dp, 0.dp))
+                        ) {
+                            drawerNavItems.forEachIndexed { index, item ->
+                                NavigationDrawerItem(
+                                    colors = NavigationDrawerItemDefaults.colors(
+                                        selectedIconColor = MaterialTheme.colorScheme.onSurface,
+                                        selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                                        selectedContainerColor = MaterialTheme.colorScheme.surface,
+                                        unselectedIconColor = MaterialTheme.colorScheme.surfaceDim,
+                                        unselectedTextColor = MaterialTheme.colorScheme.surfaceDim,
+                                    ),
+                                    label = { Text(text = item.label) },
+                                    selected = index == selectedDrawerIndex,
+                                    onClick = {
+                                        selectedDrawerIndex = index
 //                                    scope.launch { drawerState.close() }
-                                    startActivity(Intent(this@MainActivity, item.destination))
-                                    if (item.label == "Log out") {
-                                        finish()
-                                    }
-                                },
-                                icon = {
-                                    Icon(
-                                        painter = painterResource(id = item.icon),
-                                        contentDescription = item.label
-                                    )
-                                })
+                                        startActivity(Intent(this@MainActivity, item.destination))
+                                        if (item.label == "Log out") {
+                                            finish()
+                                        }
+                                    },
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(id = item.icon),
+                                            contentDescription = item.label,
+                                            modifier = Modifier.width(48.dp).height(48.dp)
+                                        )
+                                    })
+                            }
                         }
-                    }
-                }, drawerState = drawerState) {
+                    }, drawerState = drawerState
+                ) {
                     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
                         TopAppBar(
                             colors = TopAppBarColors(
@@ -176,24 +185,25 @@ class MainActivity : ComponentActivity() {
                                 navigationIconContentColor = MaterialTheme.colorScheme.onSurface
                             ),
                             title = {
-                            Text(
-                                text = stringResource(id = R.string.app_name),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surface),
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Medium,
-                            )
-
-                        }, navigationIcon = {
-                            IconButton(onClick = {
-                                scope.launch { drawerState.open() }
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Menu, contentDescription = "Menu"
+                                Text(
+                                    text = stringResource(id = R.string.app_name),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(MaterialTheme.colorScheme.surface),
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.Medium,
                                 )
-                            }
-                        })
+
+                            }, navigationIcon = {
+                                IconButton(onClick = {
+                                    scope.launch { drawerState.open() }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Menu,
+                                        contentDescription = "Menu"
+                                    )
+                                }
+                            })
                     }, bottomBar = {
                         NavigationBar(
                             containerColor = MaterialTheme.colorScheme.surface,

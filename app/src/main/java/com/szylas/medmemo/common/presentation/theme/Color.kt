@@ -17,3 +17,4 @@ val DimBlue = Color(0xff9DB2CE)
 
 val LightGray = Color(0xff555555)
 val LighterGray = Color(0xffaaaaaa)
+val Green = Color(0xff78A55A)

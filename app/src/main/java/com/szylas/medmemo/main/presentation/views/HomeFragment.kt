@@ -1,5 +1,6 @@
 package com.szylas.medmemo.main.presentation.views
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.common.presentation.components.BlockButton
-
+import com.szylas.medmemo.memos.presentation.NewMemoActivity
 
 
 @Composable
@@ -40,7 +41,11 @@ fun HomeFragment(activity: ComponentActivity) {
 
         BlockButton(
             text = "New memo",
-            onClick = { Toast.makeText(activity, "New memo", Toast.LENGTH_LONG).show() },
+            onClick = { activity.startActivity(
+                Intent(
+                    activity, NewMemoActivity::class.java
+                )
+            ) },
             modifier = Modifier.fillMaxWidth()
         )
         BlockButton(
