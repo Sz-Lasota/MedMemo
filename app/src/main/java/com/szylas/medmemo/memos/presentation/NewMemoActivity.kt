@@ -89,10 +89,6 @@ class NewMemoActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            var currentIndex by remember {
-                mutableStateOf(0)
-            }
-
 
             MedMemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize(), topBar = {

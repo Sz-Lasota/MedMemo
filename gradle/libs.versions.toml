@@ -2,7 +2,6 @@
 #noinspection AndroidGradlePluginVersion
 activityComposeVersion = "1.9.1"
 agp = "8.5.1"
-composeBomVersion = "2024.06.00"
 kotlin = "1.9.0"
 #noinspection GradleDependency
 coreKtx = "1.10.1"
