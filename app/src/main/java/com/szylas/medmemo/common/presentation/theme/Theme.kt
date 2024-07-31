@@ -23,7 +23,9 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = AppBarWhite,
     surface = AppBarBlack,
     surfaceVariant = LightGray,
-    surfaceTint = Green
+    surfaceTint = Green,
+    error = Red
+
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -39,7 +41,8 @@ private val LightColorScheme = lightColorScheme(
     onSurface = AppBarBlack,
     surface = AppBarWhite,
     surfaceVariant = LighterGray,
-    surfaceTint = Green
+    surfaceTint = Green,
+    error = Red
 
 
 

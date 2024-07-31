@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.szylas.medmemo.R
 import com.szylas.medmemo.common.domain.formatters.timeString
+import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.presentation.components.PrimaryButton
 import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.components.TimePickerDialog
@@ -45,7 +46,7 @@ import com.szylas.medmemo.memos.presentation.components.StatusBarManager
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MemoTimeFragment(
-    activity: ComponentActivity, statusBarManager: StatusBarManager, navigation: () -> Unit
+    activity: ComponentActivity, statusBarManager: StatusBarManager, memo: Memo, navigation: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -54,10 +55,10 @@ fun MemoTimeFragment(
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         var smartMode by remember {
-            mutableStateOf(false)
+            mutableStateOf(memo.smartMode)
         }
         var hours: List<Int> by remember {
-            mutableStateOf(emptyList())
+            mutableStateOf(memo.dosageTime)
         }
 
         val timePickerState = rememberTimePickerState()
@@ -89,6 +90,7 @@ fun MemoTimeFragment(
             Spacer(modifier = Modifier.weight(1f))
             Switch(checked = smartMode, onCheckedChange = {
                 smartMode = it
+                memo.smartMode = it
             })
             Spacer(modifier = Modifier.weight(1f))
             Text(text = stringResource(R.string.smart_mode), fontSize = 20.sp)
@@ -117,6 +119,7 @@ fun MemoTimeFragment(
                         list.addAll(hours)
                         list.remove(it)
                     }.toList()
+                    memo.dosageTime = hours
                 })
             }
         }
@@ -150,6 +153,8 @@ fun MemoTimeFragment(
                     hours = mutableListOf(timePickerState.hour * 60 + timePickerState.minute).also {
                         it.addAll(hours)
                     }.toList()
+                    memo.dosageTime = hours
+
                     showTimePicker = false
                 }) { Text(text = stringResource(R.string.ok), fontSize = 18.sp) }
             }, dismissButton = {

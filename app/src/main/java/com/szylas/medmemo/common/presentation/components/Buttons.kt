@@ -40,6 +40,34 @@ fun PrimaryButton(
     )
 }
 
+@Suppress("unused")
+@Composable
+fun ErrorButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    cornerRadius: Dp = 25.dp
+) {
+    ComposableButton(
+        text = text,
+        textStyle = TextStyle(
+            fontStyle = MaterialTheme.typography.labelMedium.fontStyle,
+            fontSize = MaterialTheme.typography.labelMedium.fontSize,
+            fontFamily = MaterialTheme.typography.labelMedium.fontFamily,
+            fontWeight = MaterialTheme.typography.labelMedium.fontWeight,
+        ),
+        buttonColors = ButtonColors(
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            containerColor = MaterialTheme.colorScheme.error,
+            disabledContentColor = MaterialTheme.colorScheme.tertiary,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceDim,
+        ),
+        onClick = onClick,
+        modifier = modifier,
+        cornerRadius = cornerRadius
+    )
+}
+
 @Composable
 fun SecondaryButton(
     text: String,

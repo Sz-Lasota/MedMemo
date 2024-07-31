@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.szylas.medmemo.R
+import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.presentation.components.PrimaryButton
 import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.components.TextInput
@@ -29,7 +30,10 @@ import com.szylas.medmemo.memos.presentation.components.StatusBarManager
 
 @Composable
 fun MemoNameFragment(
-    activity: ComponentActivity, statusBarManager: StatusBarManager, navigation: () -> Unit
+    activity: ComponentActivity,
+    statusBarManager: StatusBarManager,
+    memo: Memo,
+    navigation: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -38,10 +42,10 @@ fun MemoNameFragment(
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         var medName by remember {
-            mutableStateOf("")
+            mutableStateOf(memo.name)
         }
         var medDescription by remember {
-            mutableStateOf("")
+            mutableStateOf(memo.description)
         }
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -71,6 +75,7 @@ fun MemoNameFragment(
             label = stringResource(id = R.string.medicament_name),
             onValueChange = {
                 medName = it
+                memo.name = it
             })
         Text(
             modifier = Modifier.fillMaxWidth(),
@@ -83,6 +88,7 @@ fun MemoNameFragment(
             label = stringResource(id = R.string.dosage_information),
             onValueChange = {
                 medDescription = it
+                memo.description = it
             })
         PrimaryButton(
             text = stringResource(R.string.read_my_cmi),

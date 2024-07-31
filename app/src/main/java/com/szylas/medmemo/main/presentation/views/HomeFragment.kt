@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.common.presentation.components.BlockButton
@@ -44,7 +45,9 @@ fun HomeFragment(activity: ComponentActivity) {
             onClick = { activity.startActivity(
                 Intent(
                     activity, NewMemoActivity::class.java
-                )
+                ).also {
+                    it.putExtra("MEMO", Memo(name = "Hello from memo"))
+                }
             ) },
             modifier = Modifier.fillMaxWidth()
         )

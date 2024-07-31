@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.szylas.medmemo.R
+import com.szylas.medmemo.common.domain.formatters.formatFullDate
+import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.presentation.components.PrimaryButton
 import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
@@ -23,7 +25,12 @@ import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.memos.presentation.components.StatusBarManager
 
 @Composable
-fun MemoSummaryFragment(activity: ComponentActivity, statusBarManager: StatusBarManager, navigation: () -> Unit) {
+fun MemoSummaryFragment(
+    activity: ComponentActivity,
+    statusBarManager: StatusBarManager,
+    memo: Memo,
+    navigation: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,31 +50,35 @@ fun MemoSummaryFragment(activity: ComponentActivity, statusBarManager: StatusBar
         }
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "\$MedNamePlaceholder",
+            text = memo.name,
             style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM),
             softWrap = true
         )
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "\$MedDescriptionPlaceholder",
+            text = memo.description,
             style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
             softWrap = true
         )
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "\$DatePlaceholder",
+            text = if (memo.finishDate != null) "${formatFullDate(memo.startDate)} till ${
+                formatFullDate(
+                    memo.finishDate!!
+                )
+            }" else "From ${formatFullDate(memo.startDate)}",
             style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM),
             softWrap = true
         )
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "\$TimePlaceholder",
+            text = "${memo.dosageTime.size} times a day",
             style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
             softWrap = true
         )
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "\$ModePlaceholder",
+            text = if (memo.smartMode) "Smart mode" else "Strict mode",
             style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
             softWrap = true
         )
@@ -80,7 +91,6 @@ fun MemoSummaryFragment(activity: ComponentActivity, statusBarManager: StatusBar
         statusBarManager.StatusBar()
         Spacer(modifier = Modifier.weight(0.2f))
         SecondaryButton(text = "Finish", onClick = navigation, modifier = Modifier.fillMaxWidth())
-
     }
 
 }

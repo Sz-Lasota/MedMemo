@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.szylas.medmemo.R
 import com.szylas.medmemo.common.domain.formatters.formatFullDate
+import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.presentation.components.PrimaryButton
 import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
@@ -38,7 +39,10 @@ import java.util.Calendar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MemoDateFragment(
-    activity: ComponentActivity, statusBarManager: StatusBarManager, navigation: () -> Unit
+    activity: ComponentActivity,
+    statusBarManager: StatusBarManager,
+    memo: Memo,
+    navigation: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -47,11 +51,11 @@ fun MemoDateFragment(
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         var startDate by remember {
-            mutableStateOf(Calendar.getInstance())
+            mutableStateOf(memo.startDate)
         }
 
         var finishDate: Calendar? by remember {
-            mutableStateOf(null)
+            mutableStateOf(memo.finishDate)
         }
 
         val startDatePickerState = rememberDatePickerState()
@@ -110,14 +114,21 @@ fun MemoDateFragment(
             softWrap = true)
         PrimaryButton(
             text = stringResource(R.string.remove),
-            onClick = { finishDate = null },
+            onClick = {
+                finishDate = null
+                memo.finishDate = finishDate
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.weight(1f))
         statusBarManager.StatusBar()
         Spacer(modifier = Modifier.weight(0.2f))
-        SecondaryButton(text = stringResource(id = R.string.next), onClick = navigation, modifier = Modifier.fillMaxWidth())
+        SecondaryButton(
+            text = stringResource(id = R.string.next),
+            onClick = navigation,
+            modifier = Modifier.fillMaxWidth()
+        )
 
         if (startShowDatePicker) {
             DatePickerDialog(onDismissRequest = { startShowDatePicker = false }, confirmButton = {
@@ -125,8 +136,10 @@ fun MemoDateFragment(
                     val selectedDate = Calendar.getInstance().apply {
                         timeInMillis = startDatePickerState.selectedDateMillis!!
                     }
-                    if (selectedDate.after(Calendar.getInstance())) {
+                    if (selectedDate.after(Calendar.getInstance()) && (finishDate == null || selectedDate.before(finishDate))) {
                         startDate = selectedDate
+                        memo.startDate = startDate
+
                     } else {
                         Toast.makeText(
                             activity,
@@ -158,6 +171,7 @@ fun MemoDateFragment(
                         )
                     ) {
                         finishDate = selectedDate
+                        memo.finishDate = finishDate
                     } else {
                         Toast.makeText(
                             activity,

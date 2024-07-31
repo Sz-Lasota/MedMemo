@@ -2,7 +2,9 @@ package com.szylas.medmemo.memos.presentation
 
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -20,8 +22,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -44,6 +48,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.szylas.medmemo.R
+import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.main.presentation.MainActivity
@@ -60,6 +65,7 @@ import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 
 class NewMemoActivity : ComponentActivity() {
+
 
     private val statusManager = StatusBarManager(
         items = listOf(
@@ -83,13 +89,13 @@ class NewMemoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.parseColor(AppBarBlackCode))
         )
 
         setContent {
             val navController = rememberNavController()
-
             MedMemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
                     TopAppBar(colors = TopAppBarColors(
@@ -108,6 +114,18 @@ class NewMemoActivity : ComponentActivity() {
                             fontWeight = FontWeight.Medium,
                         )
 
+                    }, navigationIcon = {
+                        IconButton(onClick = {
+                            startActivity(
+                                Intent(this@NewMemoActivity, MainActivity::class.java)
+                            )
+                            finish()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Menu"
+                            )
+                        }
                     })
                 }) { innerPadding ->
                     Box(
@@ -119,11 +137,18 @@ class NewMemoActivity : ComponentActivity() {
                         var modalShow by remember {
                             mutableStateOf(false)
                         }
+
+                        val memo: Memo by remember {
+                            mutableStateOf(getMemo())
+                        }
+                        Log.d("Memo", memo.name)
+
                         NavHost(navController = navController, startDestination = MemoNameScreen) {
                             composable<MemoNameScreen> {
                                 MemoNameFragment(
                                     activity = this@NewMemoActivity,
-                                    statusBarManager = statusManager
+                                    statusBarManager = statusManager,
+                                    memo = memo
                                 ) {
                                     navController.navigate(MemoTimeScreen)
                                     statusManager.updateActive(1)
@@ -132,7 +157,8 @@ class NewMemoActivity : ComponentActivity() {
                             composable<MemoTimeScreen> {
                                 MemoTimeFragment(
                                     activity = this@NewMemoActivity,
-                                    statusBarManager = statusManager
+                                    statusBarManager = statusManager,
+                                    memo = memo
                                 ) {
                                     navController.navigate(MemoDateScreen)
                                     statusManager.updateActive(2)
@@ -141,7 +167,8 @@ class NewMemoActivity : ComponentActivity() {
                             composable<MemoDateScreen> {
                                 MemoDateFragment(
                                     activity = this@NewMemoActivity,
-                                    statusBarManager = statusManager
+                                    statusBarManager = statusManager,
+                                    memo = memo
                                 ) {
                                     navController.navigate(MemoSummaryScreen)
                                     statusManager.updateActive(3)
@@ -150,7 +177,8 @@ class NewMemoActivity : ComponentActivity() {
                             composable<MemoSummaryScreen> {
                                 MemoSummaryFragment(
                                     activity = this@NewMemoActivity,
-                                    statusBarManager = statusManager
+                                    statusBarManager = statusManager,
+                                    memo = memo
                                 ) {
                                     modalShow = true
                                 }
@@ -159,6 +187,7 @@ class NewMemoActivity : ComponentActivity() {
                         }
                         if (modalShow) {
                             ModalBottomSheet(sheetState = modalState, onDismissRequest = {
+                                // TODO: Save memo to database
                                 modalShow = false
                                 startActivity(
                                     Intent(this@NewMemoActivity, MainActivity::class.java)
@@ -180,9 +209,11 @@ class NewMemoActivity : ComponentActivity() {
                                         imageVector = Icons.Filled.Check,
                                         contentDescription = "Check"
                                     )
-                                    Text(text = "Memo created", style = TextStyleProvider.provide(
-                                        style = TextStyleOption.TITLE_LARGE
-                                    ))
+                                    Text(
+                                        text = "Memo created", style = TextStyleProvider.provide(
+                                            style = TextStyleOption.TITLE_LARGE
+                                        )
+                                    )
                                     Spacer(modifier = Modifier.height(35.dp))
                                 }
                             }
@@ -194,4 +225,17 @@ class NewMemoActivity : ComponentActivity() {
             }
         }
     }
+
+    fun getMemo(): Memo = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> if (intent.getSerializableExtra(
+                "MEMO",
+                Memo::class.java
+            ) != null
+        ) intent.getSerializableExtra("MEMO", Memo::class.java)!! else Memo()
+
+        else -> @Suppress("DEPRECATION") (if (intent.getSerializableExtra("MEMO") as? Memo != null) intent.getSerializableExtra(
+            "MEMO"
+        ) as Memo else Memo())
+    }
+
 }
