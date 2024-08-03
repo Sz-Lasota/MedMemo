@@ -1,4 +1,4 @@
-package com.szylas.medmemo.memos.presentation.views
+package com.szylas.medmemo.memo.presentation.views
 
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -33,7 +33,7 @@ import com.szylas.medmemo.common.presentation.components.PrimaryButton
 import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
-import com.szylas.medmemo.memos.presentation.components.StatusBarManager
+import com.szylas.medmemo.memo.presentation.components.StatusBarManager
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)

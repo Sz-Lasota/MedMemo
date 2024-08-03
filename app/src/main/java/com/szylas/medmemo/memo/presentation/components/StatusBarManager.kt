@@ -1,4 +1,4 @@
-package com.szylas.medmemo.memos.presentation.components
+package com.szylas.medmemo.memo.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

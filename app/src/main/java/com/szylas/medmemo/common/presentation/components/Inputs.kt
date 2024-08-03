@@ -19,7 +19,8 @@ fun TextInput(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 12.dp,
     error: Boolean = false,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
     OutlinedTextField(
         value = value,
@@ -27,6 +28,7 @@ fun TextInput(
         modifier = modifier,
         shape = RoundedCornerShape(cornerRadius),
         maxLines = 3,
+        keyboardOptions = keyboardOptions,
         isError = error,
         singleLine = singleLine,
         label = { Text(text = label) }

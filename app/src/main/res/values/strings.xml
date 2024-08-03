@@ -35,4 +35,9 @@
     <string name="choose">Choose</string>
     <string name="summary">Summary</string>
     <string name="add_picture">Add picture</string>
+    <string name="number_of_doses">Number of doses</string>
+    <string name="gap_between_doses">Gap between doses</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="edit">Edit</string>
 </resources>

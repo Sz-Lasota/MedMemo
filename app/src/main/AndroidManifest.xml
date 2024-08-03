@@ -13,7 +13,7 @@
         android:theme="@style/Theme.MedMemo"
         tools:targetApi="31">
         <activity
-            android:name=".memos.presentation.NewMemoActivity"
+            android:name=".memo.presentation.NewMemoActivity"
             android:exported="false"
             android:label="@string/newmemoactivity"
             android:theme="@style/Theme.MedMemo" />

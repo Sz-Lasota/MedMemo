@@ -1,4 +1,4 @@
-package com.szylas.medmemo.memos.presentation.views
+package com.szylas.medmemo.memo.presentation.views
 
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -22,7 +22,7 @@ import com.szylas.medmemo.common.presentation.components.PrimaryButton
 import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
-import com.szylas.medmemo.memos.presentation.components.StatusBarManager
+import com.szylas.medmemo.memo.presentation.components.StatusBarManager
 
 @Composable
 fun MemoSummaryFragment(
@@ -52,12 +52,6 @@ fun MemoSummaryFragment(
             modifier = Modifier.fillMaxWidth(),
             text = memo.name,
             style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM),
-            softWrap = true
-        )
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = memo.description,
-            style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
             softWrap = true
         )
         Text(

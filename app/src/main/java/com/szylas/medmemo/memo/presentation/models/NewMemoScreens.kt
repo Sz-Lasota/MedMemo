@@ -1,4 +1,4 @@
-package com.szylas.medmemo.memos.presentation.models
+package com.szylas.medmemo.memo.presentation.models
 
 import kotlinx.serialization.Serializable
 

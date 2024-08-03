@@ -1,5 +1,6 @@
-package com.szylas.medmemo.memos.presentation.views
+package com.szylas.medmemo.memo.presentation.views
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
@@ -41,12 +42,16 @@ import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.components.TimePickerDialog
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
-import com.szylas.medmemo.memos.presentation.components.StatusBarManager
+import com.szylas.medmemo.memo.domain.provideTimes
+import com.szylas.medmemo.memo.presentation.components.StatusBarManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MemoTimeFragment(
-    activity: ComponentActivity, statusBarManager: StatusBarManager, memo: Memo, navigation: () -> Unit
+    activity: ComponentActivity,
+    statusBarManager: StatusBarManager,
+    memo: Memo,
+    navigation: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -57,8 +62,9 @@ fun MemoTimeFragment(
         var smartMode by remember {
             mutableStateOf(memo.smartMode)
         }
+
         var hours: List<Int> by remember {
-            mutableStateOf(memo.dosageTime)
+            mutableStateOf(memo.provideTimes())
         }
 
         val timePickerState = rememberTimePickerState()
@@ -114,13 +120,39 @@ fun MemoTimeFragment(
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             items(hours) {
-                ListItem(title = timeString(it), onRemove = {
-                    hours = mutableListOf<Int>().also { list ->
-                        list.addAll(hours)
-                        list.remove(it)
-                    }.toList()
-                    memo.dosageTime = hours
-                })
+                ListItem(
+                    title = timeString(it),
+                    onEdit = { newHour ->
+                        if (hours.contains(newHour)) {
+                            Toast.makeText(
+                                activity, "This hour of dosage already exists", Toast.LENGTH_SHORT
+                            ).show()
+                            return@ListItem
+                        }
+                        hours = mutableListOf<Int>().also { list ->
+                            list.addAll(hours)
+                            list.add(newHour)
+                            list.remove(it)
+                        }.toList()
+                        memo.dosageTime = hours
+                        Log.e("MEMO TAG", "$it")
+                    },
+                    onRemove = {
+                        hours.forEachIndexed { index, item ->
+                            Log.d("MEMO hour: $index", "$item")
+                        }
+                        Log.e("PLACEHOLDER", "PLACEHOLDER")
+                        hours = mutableListOf<Int>().also { list ->
+                            list.addAll(hours)
+                            list.remove(it)
+                        }.toList()
+                        memo.dosageTime = hours
+                        hours.forEachIndexed { index, item ->
+                            Log.d("MEMO hour: $index", "$item")
+                        }
+                        Log.e("MEMO TAG", "$it")
+                    }
+                )
             }
         }
 
@@ -134,34 +166,37 @@ fun MemoTimeFragment(
         )
 
         if (showTimePicker) {
-            TimePickerDialog(onDismissRequest = { showTimePicker = false }, confirmButton = {
-                TextButton(onClick = {
-                    if (hours.contains(timePickerState.hour * 60 + timePickerState.minute)) {
+            TimePickerDialog(
+                onDismissRequest = { showTimePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        if (hours.contains(timePickerState.hour * 60 + timePickerState.minute)) {
+                            Toast.makeText(
+                                activity, "This hour of dosage already exists", Toast.LENGTH_SHORT
+                            ).show()
+                            showTimePicker = false
+                            return@TextButton
+                        }
                         Toast.makeText(
                             activity,
-                            "This hour of dosage already exists",
+                            "${timePickerState.hour * 60 + timePickerState.minute}",
                             Toast.LENGTH_SHORT
                         ).show()
-                        showTimePicker = false
-                        return@TextButton
-                    }
-                    Toast.makeText(
-                        activity,
-                        "${timePickerState.hour * 60 + timePickerState.minute}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    hours = mutableListOf(timePickerState.hour * 60 + timePickerState.minute).also {
-                        it.addAll(hours)
-                    }.toList()
-                    memo.dosageTime = hours
+                        hours =
+                            mutableListOf(timePickerState.hour * 60 + timePickerState.minute).also {
+                                it.addAll(hours)
+                            }.toList()
+                        memo.dosageTime = hours
 
-                    showTimePicker = false
-                }) { Text(text = stringResource(R.string.ok), fontSize = 18.sp) }
-            }, dismissButton = {
-                TextButton(onClick = {
-                    showTimePicker = false
-                }) { Text(text = stringResource(R.string.cancel), fontSize = 18.sp) }
-            }) {
+                        showTimePicker = false
+                    }) { Text(text = stringResource(R.string.ok), fontSize = 18.sp) }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        showTimePicker = false
+                    }) { Text(text = stringResource(R.string.cancel), fontSize = 18.sp) }
+                }
+            ) {
                 TimePicker(state = timePickerState)
             }
         }
@@ -169,8 +204,16 @@ fun MemoTimeFragment(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListItem(title: String, onRemove: () -> Unit, modifier: Modifier = Modifier) {
+fun ListItem(
+    title: String, onEdit: (Int) -> Unit, onRemove: () -> Unit, modifier: Modifier = Modifier
+) {
+    var showTimePicker by remember {
+        mutableStateOf(false)
+    }
+    val timePickerState = rememberTimePickerState()
+
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(15.dp))
@@ -178,10 +221,34 @@ fun ListItem(title: String, onRemove: () -> Unit, modifier: Modifier = Modifier)
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         Text(text = title, style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL))
         Spacer(modifier = Modifier.weight(1f))
+        SecondaryButton(
+            text = stringResource(R.string.edit), onClick = { showTimePicker = true }
+        )
         PrimaryButton(
             text = stringResource(R.string.remove), onClick = onRemove
         )
+
+
+        if (showTimePicker) {
+            TimePickerDialog(
+                onDismissRequest = { showTimePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        onEdit(timePickerState.hour * 60 + timePickerState.minute)
+                        showTimePicker = false
+                    }) { Text(text = stringResource(R.string.ok), fontSize = 18.sp) }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        showTimePicker = false
+                    }) { Text(text = stringResource(R.string.cancel), fontSize = 18.sp) }
+                }
+            ) {
+                TimePicker(state = timePickerState)
+            }
+        }
     }
 }

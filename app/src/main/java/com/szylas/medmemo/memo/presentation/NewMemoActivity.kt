@@ -1,4 +1,4 @@
-package com.szylas.medmemo.memos.presentation
+package com.szylas.medmemo.memo.presentation
 
 import android.content.Intent
 import android.graphics.Color
@@ -52,15 +52,15 @@ import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.main.presentation.MainActivity
-import com.szylas.medmemo.memos.presentation.components.StatusBarManager
-import com.szylas.medmemo.memos.presentation.models.MemoDateScreen
-import com.szylas.medmemo.memos.presentation.models.MemoNameScreen
-import com.szylas.medmemo.memos.presentation.models.MemoSummaryScreen
-import com.szylas.medmemo.memos.presentation.models.MemoTimeScreen
-import com.szylas.medmemo.memos.presentation.views.MemoDateFragment
-import com.szylas.medmemo.memos.presentation.views.MemoNameFragment
-import com.szylas.medmemo.memos.presentation.views.MemoSummaryFragment
-import com.szylas.medmemo.memos.presentation.views.MemoTimeFragment
+import com.szylas.medmemo.memo.presentation.components.StatusBarManager
+import com.szylas.medmemo.memo.presentation.models.MemoDateScreen
+import com.szylas.medmemo.memo.presentation.models.MemoNameScreen
+import com.szylas.medmemo.memo.presentation.models.MemoSummaryScreen
+import com.szylas.medmemo.memo.presentation.models.MemoTimeScreen
+import com.szylas.medmemo.memo.presentation.views.MemoDateFragment
+import com.szylas.medmemo.memo.presentation.views.MemoNameFragment
+import com.szylas.medmemo.memo.presentation.views.MemoSummaryFragment
+import com.szylas.medmemo.memo.presentation.views.MemoTimeFragment
 import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 
@@ -116,9 +116,9 @@ class NewMemoActivity : ComponentActivity() {
 
                     }, navigationIcon = {
                         IconButton(onClick = {
-                            startActivity(
-                                Intent(this@NewMemoActivity, MainActivity::class.java)
-                            )
+//                            startActivity(
+//                                Intent(this@NewMemoActivity, MainActivity::class.java)
+//                            )
                             finish()
                         }) {
                             Icon(

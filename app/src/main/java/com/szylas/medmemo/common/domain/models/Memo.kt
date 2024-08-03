@@ -5,9 +5,16 @@ import java.util.Calendar
 
 data class Memo(
     var name: String = "",
-    var description: String = "",
+    var numberOfDoses: Int = 0,
     var smartMode: Boolean = false,
     var dosageTime: List<Int> = listOf(),
     var startDate: Calendar = Calendar.getInstance(),
-    var finishDate: Calendar? = null
-): Serializable
+    var finishDate: Calendar? = null,
+    var gap: Int = 0
+): Serializable {
+
+    fun predictDosageHours() : List<Int> {
+        return dosageTime
+    }
+
+}
