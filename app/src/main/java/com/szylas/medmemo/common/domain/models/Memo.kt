@@ -11,10 +11,4 @@ data class Memo(
     var startDate: Calendar = Calendar.getInstance(),
     var finishDate: Calendar? = null,
     var gap: Int = 0
-): Serializable {
-
-    fun predictDosageHours() : List<Int> {
-        return dosageTime
-    }
-
-}
+) : Serializable

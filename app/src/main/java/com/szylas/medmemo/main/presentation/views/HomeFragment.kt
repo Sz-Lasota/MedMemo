@@ -14,10 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.szylas.medmemo.common.domain.models.Memo
+import com.szylas.medmemo.common.presentation.components.BlockButton
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
-import com.szylas.medmemo.common.presentation.components.BlockButton
 import com.szylas.medmemo.memo.presentation.NewMemoActivity
 
 

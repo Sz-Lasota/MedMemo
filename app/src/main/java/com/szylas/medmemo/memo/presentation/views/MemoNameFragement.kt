@@ -32,7 +32,7 @@ import com.szylas.medmemo.memo.presentation.components.StatusBarManager
 
 @Composable
 fun MemoNameFragment(
-    activity: ComponentActivity,
+    @Suppress("UNUSED_PARAMETER") activity: ComponentActivity,
     statusBarManager: StatusBarManager,
     memo: Memo,
     navigation: () -> Unit
