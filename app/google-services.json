@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "984439343507",
+    "project_id": "medmemo-26763",
+    "storage_bucket": "medmemo-26763.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:984439343507:android:e6d2b0b4fe1ec23db60066",
+        "android_client_info": {
+          "package_name": "com.szylas.medmemo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeRc_IRt2pCxQCtii_oyQwDSQwJccx2kg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

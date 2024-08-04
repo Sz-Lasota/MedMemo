@@ -2,6 +2,8 @@
 #noinspection AndroidGradlePluginVersion
 activityComposeVersion = "1.9.1"
 agp = "8.5.1"
+firebaseAnalytics = "22.0.2"
+firebaseBom = "33.1.2"
 kotlin = "1.9.0"
 #noinspection GradleDependency
 coreKtx = "1.10.1"
@@ -25,11 +27,16 @@ navigationCompose = "2.7.7"
 composeNavigation = "2.8.0-alpha08"
 serialization = "1.6.3"
 ycharts = "2.1.0"
+firebaseAuthKtx = "23.0.0"
+firebaseFirestore = "25.0.0"
 
 [libraries]
 androidx-activity-compose-v172 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+google-firebase-analytics = { module = "com.google.firebase:firebase-analytics", version.ref = "firebaseAnalytics" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -52,6 +59,8 @@ ui = { module = "androidx.compose.ui:ui" }
 ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 ycharts = { module = "co.yml:ycharts", version.ref = "ycharts" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

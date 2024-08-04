@@ -27,7 +27,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import com.szylas.medmemo.R
+import com.szylas.medmemo.auth.domain.managers.AuthManagerConfiguration
+import com.szylas.medmemo.auth.domain.managers.AuthManagerProvider
+import com.szylas.medmemo.auth.domain.models.LoginCredentials
 import com.szylas.medmemo.common.presentation.components.AppLogo
 import com.szylas.medmemo.common.presentation.components.PasswordInput
 import com.szylas.medmemo.common.presentation.components.PrimaryButton
@@ -38,11 +42,17 @@ import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.main.presentation.MainActivity
 import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class LoginActivity : ComponentActivity() {
 
     private lateinit var eMail: MutableState<String>
     private lateinit var password: MutableState<String>
+
+    // TODO: Configuration stored in settings, abstract manager creation
+    private val authManager =
+        AuthManagerProvider.use() ?: AuthManagerProvider.provide(AuthManagerConfiguration.FIREBASE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -104,8 +114,24 @@ class LoginActivity : ComponentActivity() {
         ) {
             PrimaryButton(
                 text = stringResource(R.string.login), onClick = {
-                    Toast.makeText(this@LoginActivity, password.value, Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+//                    Toast.makeText(this@LoginActivity, password.value, Toast.LENGTH_SHORT).show()
+
+
+                    lifecycleScope.login(
+                        credentials = LoginCredentials(eMail.value, password.value),
+                        onSuccess = { name ->
+                            startActivity(
+                                Intent(
+                                    this@LoginActivity,
+                                    MainActivity::class.java
+                                ).also { it.putExtra("USER_NAME", name) })
+                            finish()
+                        },
+                        onError = {
+                            Toast.makeText(this@LoginActivity, it, Toast.LENGTH_SHORT).show()
+                        }
+                    )
+
                 }, modifier = Modifier.fillMaxWidth()
             )
             Text(
@@ -135,7 +161,7 @@ class LoginActivity : ComponentActivity() {
                 value = eMail.value,
                 label = stringResource(R.string.e_mail),
                 onValueChange = { eMail.value = it },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             PasswordInput(
                 value = password.value,
@@ -172,5 +198,19 @@ class LoginActivity : ComponentActivity() {
             )
         }
     }
+
+
+    private fun CoroutineScope.login(
+        credentials: LoginCredentials,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) = launch {
+        authManager.login(
+            credentials = credentials,
+            onSuccess = onSuccess,
+            onError = onError
+        )
+    }
+
 
 }

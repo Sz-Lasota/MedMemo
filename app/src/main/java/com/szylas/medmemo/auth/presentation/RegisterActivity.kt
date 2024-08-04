@@ -3,6 +3,7 @@ package com.szylas.medmemo.auth.presentation
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -25,7 +26,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import com.szylas.medmemo.R
+import com.szylas.medmemo.auth.domain.managers.AuthManagerConfiguration
+import com.szylas.medmemo.auth.domain.managers.AuthManagerProvider
+import com.szylas.medmemo.auth.domain.models.RegisterCredentials
 import com.szylas.medmemo.common.presentation.components.AppLogo
 import com.szylas.medmemo.common.presentation.components.PasswordInput
 import com.szylas.medmemo.common.presentation.components.PrimaryButton
@@ -34,6 +39,8 @@ import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class RegisterActivity : ComponentActivity() {
 
@@ -41,6 +48,9 @@ class RegisterActivity : ComponentActivity() {
     private lateinit var name: MutableState<String>
     private lateinit var password: MutableState<String>
     private lateinit var repeatPassword: MutableState<String>
+
+    private val authManager =
+        AuthManagerProvider.use() ?: AuthManagerProvider.provide(AuthManagerConfiguration.FIREBASE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -84,8 +94,7 @@ class RegisterActivity : ComponentActivity() {
                             horizontalAlignment = Alignment.Start
                         ) {
                             AppLogo(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth(),
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
@@ -93,13 +102,17 @@ class RegisterActivity : ComponentActivity() {
                                     style = TextStyleOption.TITLE_LARGE
                                 )
                             )
-                            Spacer(modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f))
+                            Spacer(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            )
                             Inputs()
-                            Spacer(modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(2f))
+                            Spacer(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(2f)
+                            )
                             Column(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalArrangement = Arrangement.spacedBy(
@@ -107,12 +120,29 @@ class RegisterActivity : ComponentActivity() {
                                 )
                             ) {
                                 PrimaryButton(
-                                    text = stringResource(id = R.string.sing_up), onClick = {
-                                        startActivity(
-                                            Intent(this@RegisterActivity, LoginActivity::class.java)
-                                        )
-                                        finish()
-                                    }, modifier = Modifier.fillMaxWidth()
+                                    text = stringResource(id = R.string.sing_up),
+                                    onClick = {
+                                        lifecycleScope.register(credentials = getRegisterCredentials(),
+                                            onSuccess = {
+                                                startActivity(
+                                                    Intent(
+                                                        this@RegisterActivity,
+                                                        LoginActivity::class.java
+                                                    )
+                                                )
+                                                finish()
+                                                Toast.makeText(
+                                                    this@RegisterActivity, it, Toast.LENGTH_SHORT
+                                                ).show()
+                                            },
+                                            onError = {
+                                                Toast.makeText(
+                                                    this@RegisterActivity, it, Toast.LENGTH_SHORT
+                                                ).show()
+                                            })
+
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             }
                         }
@@ -157,5 +187,20 @@ class RegisterActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxWidth()
             )
         }
+    }
+
+    private fun getRegisterCredentials(): RegisterCredentials = RegisterCredentials(
+        eMail = eMail.value,
+        name = name.value,
+        password = password.value,
+        repeatedPassword = repeatPassword.value
+    )
+
+    private fun CoroutineScope.register(
+        credentials: RegisterCredentials, onSuccess: (String) -> Unit, onError: (String) -> Unit
+    ) = launch {
+        authManager.register(
+            credentials = credentials, onSuccess = onSuccess, onError = onError
+        )
     }
 }
