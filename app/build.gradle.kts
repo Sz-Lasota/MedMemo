@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -55,6 +56,8 @@ dependencies {
 //    implementation 'co.yml:ycharts:2.1.0'
     implementation(libs.ycharts)
     implementation(libs.androidx.activity.compose.v172)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 //    implementation(platform(libs.androidx.compose.bom.v20230800))
     implementation(libs.ui)
     implementation(libs.ui.graphics)
@@ -72,6 +75,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.google.firebase.analytics)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
