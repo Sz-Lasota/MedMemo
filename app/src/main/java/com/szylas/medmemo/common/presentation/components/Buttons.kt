@@ -18,7 +18,8 @@ fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    cornerRadius: Dp = 25.dp
+    cornerRadius: Dp = 25.dp,
+    enabled: Boolean = true
 ) {
     ComposableButton(
         text = text,
@@ -31,12 +32,13 @@ fun PrimaryButton(
         buttonColors = ButtonColors(
             contentColor = MaterialTheme.colorScheme.onPrimary,
             containerColor = MaterialTheme.colorScheme.primary,
-            disabledContentColor = MaterialTheme.colorScheme.tertiary,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceDim,
+            disabledContentColor = MaterialTheme.colorScheme.onSecondary,
+            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
         onClick = onClick,
         modifier = modifier,
-        cornerRadius = cornerRadius
+        cornerRadius = cornerRadius,
+        enabled = enabled
     )
 }
 
@@ -46,7 +48,8 @@ fun ErrorButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    cornerRadius: Dp = 25.dp
+    cornerRadius: Dp = 25.dp,
+    enabled: Boolean = true
 ) {
     ComposableButton(
         text = text,
@@ -59,12 +62,13 @@ fun ErrorButton(
         buttonColors = ButtonColors(
             contentColor = MaterialTheme.colorScheme.onPrimary,
             containerColor = MaterialTheme.colorScheme.error,
-            disabledContentColor = MaterialTheme.colorScheme.tertiary,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceDim,
+            disabledContentColor = MaterialTheme.colorScheme.onSecondary,
+            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
         onClick = onClick,
         modifier = modifier,
-        cornerRadius = cornerRadius
+        cornerRadius = cornerRadius,
+        enabled = enabled
     )
 }
 
@@ -73,7 +77,8 @@ fun SecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    cornerRadius: Dp = 25.dp
+    cornerRadius: Dp = 25.dp,
+    enabled: Boolean = true
 ) {
     ComposableButton(
         text = text,
@@ -86,12 +91,13 @@ fun SecondaryButton(
         buttonColors = ButtonColors(
             contentColor = MaterialTheme.colorScheme.onSecondary,
             containerColor = MaterialTheme.colorScheme.secondary,
-            disabledContentColor = MaterialTheme.colorScheme.tertiary,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceDim,
+            disabledContentColor = MaterialTheme.colorScheme.onSecondary,
+            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
         onClick = onClick,
         modifier = modifier,
-        cornerRadius = cornerRadius
+        cornerRadius = cornerRadius,
+        enabled = enabled
     )
 }
 
@@ -136,14 +142,16 @@ private fun ComposableButton(
     buttonColors: ButtonColors,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    cornerRadius: Dp = 25.dp
+    cornerRadius: Dp = 25.dp,
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(cornerRadius),
         modifier = modifier
             .height(50.dp),
-        colors = buttonColors
+        colors = buttonColors,
+        enabled = enabled
     ) {
         Text(
             modifier = Modifier

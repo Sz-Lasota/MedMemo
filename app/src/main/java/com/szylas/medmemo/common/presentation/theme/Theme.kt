@@ -24,7 +24,8 @@ private val DarkColorScheme = darkColorScheme(
     surface = AppBarBlack,
     surfaceVariant = LightGray,
     surfaceTint = Green,
-    error = Red
+    error = Red,
+    secondaryContainer = LightGray
 
 )
 
@@ -42,7 +43,8 @@ private val LightColorScheme = lightColorScheme(
     surface = AppBarWhite,
     surfaceVariant = LighterGray,
     surfaceTint = Green,
-    error = Red
+    error = Red,
+    secondaryContainer = LightGray
 
 
 
