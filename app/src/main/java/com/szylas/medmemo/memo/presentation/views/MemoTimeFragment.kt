@@ -42,7 +42,7 @@ import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.components.TimePickerDialog
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
-import com.szylas.medmemo.memo.domain.provideTimes
+import com.szylas.medmemo.memo.domain.extensions.provideTimes
 import com.szylas.medmemo.memo.presentation.components.StatusBarManager
 
 @OptIn(ExperimentalMaterial3Api::class)
