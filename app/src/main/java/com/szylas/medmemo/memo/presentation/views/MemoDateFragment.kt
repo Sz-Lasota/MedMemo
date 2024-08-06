@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +14,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -58,6 +60,10 @@ fun MemoDateFragment(
             mutableStateOf(memo.finishDate)
         }
 
+        var endless by remember {
+            mutableStateOf(memo.finishDate == null)
+        }
+
         val startDatePickerState = rememberDatePickerState()
         var startShowDatePicker by remember { mutableStateOf(false) }
 
@@ -95,31 +101,38 @@ fun MemoDateFragment(
             softWrap = true
         )
 
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(R.string.finish_date_leave_blank_for_endless),
-            style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM),
-            softWrap = true
-        )
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                modifier = Modifier,
+                text = stringResource(R.string.finish_date),
+                style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM),
+                softWrap = true
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Switch(checked = !endless, onCheckedChange = {
+                endless = !it
+                if (!it) {
+                    finishDate = null
+                    memo.finishDate = null
+                }
+            })
+        }
+
         PrimaryButton(
             text = stringResource(R.string.choose),
             onClick = { finishShowDatePicker = true },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !endless
         )
 
-        Text(modifier = Modifier.fillMaxWidth(),
+        Text(
+            modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
             text = finishDate?.let { formatFullDate(it) } ?: "Endless",
             style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
-            softWrap = true)
-        PrimaryButton(
-            text = stringResource(R.string.remove),
-            onClick = {
-                finishDate = null
-                memo.finishDate = finishDate
-            },
-            modifier = Modifier.fillMaxWidth()
+            softWrap = true,
         )
+
 
         Spacer(modifier = Modifier.weight(1f))
         statusBarManager.StatusBar()
@@ -136,7 +149,10 @@ fun MemoDateFragment(
                     val selectedDate = Calendar.getInstance().apply {
                         timeInMillis = startDatePickerState.selectedDateMillis!!
                     }
-                    if (selectedDate.after(Calendar.getInstance()) && (finishDate == null || selectedDate.before(finishDate))) {
+                    if (selectedDate.after(Calendar.getInstance()) && (finishDate == null || selectedDate.before(
+                            finishDate
+                        ))
+                    ) {
                         startDate = selectedDate
                         memo.startDate = startDate
 

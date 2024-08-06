@@ -31,7 +31,7 @@
     <string name="remove">Remove</string>
     <string name="date_information">Date information</string>
     <string name="start_date">Start date</string>
-    <string name="finish_date_leave_blank_for_endless">Finish date (Leave blank for endless)</string>
+    <string name="finish_date">Finish date?</string>
     <string name="choose">Choose</string>
     <string name="summary">Summary</string>
     <string name="add_picture">Add picture</string>
