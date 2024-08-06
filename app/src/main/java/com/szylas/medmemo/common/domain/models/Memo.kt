@@ -10,5 +10,6 @@ data class Memo(
     var dosageTime: List<Int> = listOf(),
     var startDate: Calendar = Calendar.getInstance(),
     var finishDate: Calendar? = null,
-    var gap: Int = 0
+    var gap: Int = 0,
+    var notifications: MutableList<MemoNotification> = mutableListOf()
 ) : Serializable

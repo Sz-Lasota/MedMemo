@@ -1,8 +1,7 @@
 package com.szylas.medmemo.memo.presentation
 
-import android.content.Intent
+
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -44,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -51,7 +51,9 @@ import com.szylas.medmemo.R
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
-import com.szylas.medmemo.main.presentation.MainActivity
+import com.szylas.medmemo.memo.datastore.FirebaseMemoSaver
+import com.szylas.medmemo.memo.domain.extensions.generateNotifications
+import com.szylas.medmemo.memo.domain.managers.MemoManager
 import com.szylas.medmemo.memo.presentation.components.StatusBarManager
 import com.szylas.medmemo.memo.presentation.models.MemoDateScreen
 import com.szylas.medmemo.memo.presentation.models.MemoNameScreen
@@ -63,9 +65,14 @@ import com.szylas.medmemo.memo.presentation.views.MemoSummaryFragment
 import com.szylas.medmemo.memo.presentation.views.MemoTimeFragment
 import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class NewMemoActivity : ComponentActivity() {
 
+
+    // TODO: abstract creation
+    private val memoManager = MemoManager(FirebaseMemoSaver())
 
     private val statusManager = StatusBarManager(
         items = listOf(
@@ -116,9 +123,6 @@ class NewMemoActivity : ComponentActivity() {
 
                     }, navigationIcon = {
                         IconButton(onClick = {
-//                            startActivity(
-//                                Intent(this@NewMemoActivity, MainActivity::class.java)
-//                            )
                             finish()
                         }) {
                             Icon(
@@ -139,7 +143,7 @@ class NewMemoActivity : ComponentActivity() {
                         }
 
                         val memo: Memo by remember {
-                            mutableStateOf(getMemo())
+                            mutableStateOf(Memo())
                         }
                         Log.d("Memo", memo.name)
 
@@ -180,18 +184,31 @@ class NewMemoActivity : ComponentActivity() {
                                     statusBarManager = statusManager,
                                     memo = memo
                                 ) {
-                                    modalShow = true
+                                    Log.w("MEMO_PERSIST", "Generating")
+                                    memo.generateNotifications()
+                                    lifecycleScope.persist(
+                                        memo = memo,
+                                        onSuccess = {
+                                            Log.d("MEMO_PERSIST", "Success")
+                                            modalShow = true
+                                        },
+                                        onError = {
+                                            Log.e("MEMO_PERSIST", "Unable to persist memo: $it")
+                                        },
+                                        onSessionNotFound = {
+                                            Log.d("MEMO_PERSIST", "Session not found")
+                                        }
+                                    )
                                 }
                             }
 
                         }
                         if (modalShow) {
                             ModalBottomSheet(sheetState = modalState, onDismissRequest = {
-                                // TODO: Save memo to database
                                 modalShow = false
-                                startActivity(
-                                    Intent(this@NewMemoActivity, MainActivity::class.java)
-                                )
+//                                startActivity(
+//                                    Intent(this@NewMemoActivity, MainActivity::class.java)
+//                                )
                                 finish()
                             }) {
                                 Column(
@@ -226,16 +243,20 @@ class NewMemoActivity : ComponentActivity() {
         }
     }
 
-    fun getMemo(): Memo = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> if (intent.getSerializableExtra(
-                "MEMO",
-                Memo::class.java
-            ) != null
-        ) intent.getSerializableExtra("MEMO", Memo::class.java)!! else Memo()
 
-        else -> @Suppress("DEPRECATION") (if (intent.getSerializableExtra("MEMO") as? Memo != null) intent.getSerializableExtra(
-            "MEMO"
-        ) as Memo else Memo())
-    }
+    fun CoroutineScope.persist(
+        memo: Memo,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+        onSessionNotFound: () -> Unit
+    ) =
+        launch {
+            memoManager.saveMemo(
+                memo = memo,
+                onSuccess = onSuccess,
+                onError = onError,
+                onSessionNotFound = onSessionNotFound
+            )
+        }
 
 }
