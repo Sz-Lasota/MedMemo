@@ -16,4 +16,6 @@ interface IAuthConnector {
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     )
+
+    suspend fun checkForSession(onSuccess: (String) -> Unit)
 }

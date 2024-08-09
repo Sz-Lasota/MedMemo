@@ -62,6 +62,7 @@ import com.szylas.medmemo.main.presentation.models.StatisticsScreen
 import com.szylas.medmemo.main.presentation.views.CalendarFragment
 import com.szylas.medmemo.main.presentation.views.HomeFragment
 import com.szylas.medmemo.main.presentation.views.StatisticsFragment
+import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
 import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 import kotlinx.coroutines.launch
@@ -158,7 +159,6 @@ class MainActivity : ComponentActivity() {
                                     selected = index == selectedDrawerIndex,
                                     onClick = {
                                         selectedDrawerIndex = index
-//                                    scope.launch { drawerState.close() }
                                         startActivity(Intent(this@MainActivity, item.destination))
                                         if (item.label == "Log out") {
                                             finish()
@@ -228,6 +228,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }) { innerPadding ->
+                        registerNotificationChannel(this)
                         Box(
                             modifier = Modifier
                                 .padding(innerPadding)

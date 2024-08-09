@@ -1,6 +1,9 @@
 [versions]
 #noinspection AndroidGradlePluginVersion
+accompanistPermissions = "0.31.1-alpha"
+accompanistSystemuicontroller = "0.27.0"
 activityComposeVersion = "1.9.1"
+#noinspection AndroidGradlePluginVersion
 agp = "8.5.1"
 firebaseAnalytics = "22.0.2"
 firebaseBom = "33.1.2"
@@ -31,6 +34,8 @@ firebaseAuthKtx = "23.0.0"
 firebaseFirestore = "25.0.0"
 
 [libraries]
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 androidx-activity-compose-v172 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }

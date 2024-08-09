@@ -1,4 +1,4 @@
-package com.szylas.medmemo.common.datastore
+package com.szylas.medmemo.auth.datastore.session
 
 import com.google.firebase.auth.FirebaseAuth
 

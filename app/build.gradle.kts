@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.szylas.medmemo"
-        minSdk = 30
+        minSdk = 29
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -52,6 +52,9 @@ android {
 }
 
 dependencies {
+    implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.accompanist.permissions)
+
     implementation(libs.navigation.compose)
 //    implementation 'co.yml:ycharts:2.1.0'
     implementation(libs.ycharts)

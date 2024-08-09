@@ -18,7 +18,6 @@ class FirebaseMemoSaver: IMemoSaver {
             .document(memo.id())
             .set(memo)
             .addOnSuccessListener {
-
                 onSuccess("Successfully created memo: ${memo.name}!")
             }.addOnFailureListener {
                 onError(it.message ?: "Unknown error when persisting memo")
@@ -40,7 +39,14 @@ class FirebaseMemoSaver: IMemoSaver {
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
-        TODO("Not yet implemented")
+        firebase.collection(user)
+            .document(memo.id())
+            .set(memo)
+            .addOnSuccessListener {
+                onSuccess("Successfully updated memo: ${memo.name}!")
+            }.addOnFailureListener {
+                onError(it.message ?: "Unknown error when updating memo")
+            }
     }
 
 

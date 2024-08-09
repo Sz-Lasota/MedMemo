@@ -1,6 +1,7 @@
 package com.szylas.medmemo.auth.domain.managers
 
 import com.szylas.medmemo.auth.datastore.IAuthConnector
+import com.szylas.medmemo.auth.domain.Session
 import com.szylas.medmemo.auth.domain.models.LoginCredentials
 import com.szylas.medmemo.auth.domain.models.RegisterCredentials
 import com.szylas.medmemo.auth.domain.validation.validateEmail
@@ -11,6 +12,8 @@ import kotlinx.coroutines.Dispatchers
 class AuthManager(
     private val connector: IAuthConnector
 ) {
+
+    val user: String? = Session.user()
 
     suspend fun login(
         credentials: LoginCredentials,
@@ -49,5 +52,11 @@ class AuthManager(
 
         connector.register(credentials, onSuccess, onError)
     }
+
+    suspend fun checkForSession(onSuccess: (String) -> Unit ) {
+        connector.checkForSession(onSuccess)
+    }
+
+
 
 }

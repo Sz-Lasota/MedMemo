@@ -40,4 +40,5 @@
     <string name="hours">Hours</string>
     <string name="minutes">Minutes</string>
     <string name="edit">Edit</string>
+    <string name="remember_to_take_your_med">Remember to take your med</string>
 </resources>

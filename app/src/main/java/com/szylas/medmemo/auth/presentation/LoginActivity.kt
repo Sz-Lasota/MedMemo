@@ -1,7 +1,9 @@
 package com.szylas.medmemo.auth.presentation
 
+import android.Manifest
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -19,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +31,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.szylas.medmemo.R
 import com.szylas.medmemo.auth.domain.managers.AuthManagerConfiguration
 import com.szylas.medmemo.auth.domain.managers.AuthManagerProvider
@@ -40,6 +46,7 @@ import com.szylas.medmemo.common.presentation.components.TextInput
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.main.presentation.MainActivity
+import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
 import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 import kotlinx.coroutines.CoroutineScope
@@ -54,9 +61,18 @@ class LoginActivity : ComponentActivity() {
     private val authManager =
         AuthManagerProvider.use() ?: AuthManagerProvider.provide(AuthManagerConfiguration.FIREBASE)
 
+    @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
+        lifecycleScope.checkForSession {
+            startActivity(
+                Intent(this, MainActivity::class.java).apply {
+                    putExtra("USER_NAME", it)
+                }
+            )
+        }
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.parseColor(AppBarBlackCode))
@@ -73,6 +89,18 @@ class LoginActivity : ComponentActivity() {
                     password = remember {
                         mutableStateOf("")
                     }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val postNotificationPermission =
+                            rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+                        LaunchedEffect(key1 = true) {
+                            if (!postNotificationPermission.status.isGranted) {
+                                postNotificationPermission.launchPermissionRequest()
+                            }
+                        }
+
+                    }
+                    registerNotificationChannel(this)
+
                     Box(
                         modifier = Modifier
                             .padding(innerPadding)
@@ -114,9 +142,6 @@ class LoginActivity : ComponentActivity() {
         ) {
             PrimaryButton(
                 text = stringResource(R.string.login), onClick = {
-//                    Toast.makeText(this@LoginActivity, password.value, Toast.LENGTH_SHORT).show()
-
-
                     lifecycleScope.login(
                         credentials = LoginCredentials(eMail.value, password.value),
                         onSuccess = { name ->
@@ -199,6 +224,12 @@ class LoginActivity : ComponentActivity() {
         }
     }
 
+
+    private fun CoroutineScope.checkForSession(
+        onSuccess: (String) -> Unit
+    ) = launch {
+        authManager.checkForSession(onSuccess = onSuccess)
+    }
 
     private fun CoroutineScope.login(
         credentials: LoginCredentials,

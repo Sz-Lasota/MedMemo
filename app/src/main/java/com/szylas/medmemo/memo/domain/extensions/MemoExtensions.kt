@@ -16,31 +16,66 @@ fun Memo.id(): String {
 }
 
 fun Memo.generateNotifications() {
+    val idBase = (Calendar.getInstance().timeInMillis % 100_000).toInt()
+    var index = 0
     dosageTime.forEach { hour ->
         val date = Calendar.getInstance().apply {
             timeInMillis = startDate.timeInMillis
         }
-        while (!date.after(finishDate)) {
-            notifications.add(
-                MemoNotification(
-                    date = Calendar.getInstance().apply {
-                        timeInMillis = date.timeInMillis
-                        set(Calendar.HOUR_OF_DAY, hour / 60)
-                        set(Calendar.MINUTE, hour % 60)
-                    }
-                )
-            )
-            date.add(Calendar.DATE, 1)
-        }
-        notifications.add(
-            MemoNotification(
-                date = Calendar.getInstance().apply {
+
+
+        val now = Calendar.getInstance()
+        if (finishDate != null) {
+            while (!date.after(finishDate)) {
+                val notifiyDate = Calendar.getInstance().apply {
                     timeInMillis = date.timeInMillis
                     set(Calendar.HOUR_OF_DAY, hour / 60)
                     set(Calendar.MINUTE, hour % 60)
                 }
-            )
-        )
+                if (notifiyDate.before(now)) {
+                    date.add(Calendar.DATE, 1)
+                    index++
+                    continue
+                }
+                notifications.add(
+                    MemoNotification(
+                        date = notifiyDate,
+                        name = name,
+                        notificationId = idBase + index
+                    )
+                )
+                date.add(Calendar.DATE, 1)
+                index++
+            }
+            notifications.add(MemoNotification(date = Calendar.getInstance().apply {
+                timeInMillis = date.timeInMillis
+                set(Calendar.HOUR_OF_DAY, hour / 60)
+                set(Calendar.MINUTE, hour % 60)
+            }, name = name, notificationId = idBase + index))
+            index++
+        } else {
+            for (i in 1..14) {
+                val notifiyDate = Calendar.getInstance().apply {
+                    timeInMillis = date.timeInMillis
+                    set(Calendar.HOUR_OF_DAY, hour / 60)
+                    set(Calendar.MINUTE, hour % 60)
+                }
+                if (notifiyDate.before(now)) {
+                    date.add(Calendar.DATE, 1)
+                    index++
+                    continue
+                }
+                notifications.add(
+                    MemoNotification(
+                        date = notifiyDate,
+                        name = name,
+                        notificationId = idBase + index
+                    )
+                )
+                date.add(Calendar.DATE, 1)
+                index++
+            }
+        }
     }
 }
 

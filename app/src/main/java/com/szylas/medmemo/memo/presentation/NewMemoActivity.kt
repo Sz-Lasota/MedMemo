@@ -1,6 +1,10 @@
 package com.szylas.medmemo.memo.presentation
 
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -51,9 +55,10 @@ import com.szylas.medmemo.R
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
-import com.szylas.medmemo.memo.datastore.FirebaseMemoSaver
 import com.szylas.medmemo.memo.domain.extensions.generateNotifications
-import com.szylas.medmemo.memo.domain.managers.MemoManager
+import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
+import com.szylas.medmemo.memo.domain.notifications.MemoNotificationReceiver
+import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
 import com.szylas.medmemo.memo.presentation.components.StatusBarManager
 import com.szylas.medmemo.memo.presentation.models.MemoDateScreen
 import com.szylas.medmemo.memo.presentation.models.MemoNameScreen
@@ -72,7 +77,7 @@ class NewMemoActivity : ComponentActivity() {
 
 
     // TODO: abstract creation
-    private val memoManager = MemoManager(FirebaseMemoSaver())
+    private val memoManager = MemoManagerProvider.memoManager
 
     private val statusManager = StatusBarManager(
         items = listOf(
@@ -88,14 +93,14 @@ class NewMemoActivity : ComponentActivity() {
             StatusBarManager.StatusBarItem(
                 icon = R.drawable.exit, destination = MemoSummaryScreen
             ),
-
-            )
+        )
     )
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        registerNotificationChannel(this)
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.parseColor(AppBarBlackCode))
@@ -190,6 +195,7 @@ class NewMemoActivity : ComponentActivity() {
                                         memo = memo,
                                         onSuccess = {
                                             Log.d("MEMO_PERSIST", "Success")
+                                            scheduleNotifications(memo)
                                             modalShow = true
                                         },
                                         onError = {
@@ -206,9 +212,6 @@ class NewMemoActivity : ComponentActivity() {
                         if (modalShow) {
                             ModalBottomSheet(sheetState = modalState, onDismissRequest = {
                                 modalShow = false
-//                                startActivity(
-//                                    Intent(this@NewMemoActivity, MainActivity::class.java)
-//                                )
                                 finish()
                             }) {
                                 Column(
@@ -240,6 +243,32 @@ class NewMemoActivity : ComponentActivity() {
 
                 }
             }
+        }
+    }
+
+    private fun scheduleNotifications(memo: Memo) {
+        memo.notifications.forEach {
+            val intent = Intent(applicationContext, MemoNotificationReceiver::class.java).apply {
+                putExtra("NOTIFICATION", it)
+                putExtra("MEMO", memo)
+            }
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                applicationContext,
+                it.notificationId,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+
+            val alarm = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+            Log.d("SCHEDULE", "Notification (id: ${it.notificationId}, name: ${it.name}) scheduled at: ${it.date.timeInMillis}")
+
+            alarm.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                it.date.timeInMillis,
+                pendingIntent
+            )
         }
     }
 

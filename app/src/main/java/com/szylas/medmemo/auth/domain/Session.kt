@@ -1,6 +1,6 @@
-package com.szylas.medmemo.common.domain
+package com.szylas.medmemo.auth.domain
 
-import com.szylas.medmemo.common.datastore.FirebaseSessionStore
+import com.szylas.medmemo.auth.datastore.session.FirebaseSessionStore
 
 object Session {
     // TODO: Prepare for other means of authentication
