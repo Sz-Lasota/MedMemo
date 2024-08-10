@@ -7,7 +7,7 @@ data class NavBarItem(
     val unselectedIcon: Int
 )
 
-data class NavDrawerItem(
+data class ProfileItem(
     val destination: Class<*>,
     val label: String,
     val icon: Int,

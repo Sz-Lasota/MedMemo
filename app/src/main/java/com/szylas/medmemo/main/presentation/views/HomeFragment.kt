@@ -5,7 +5,9 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -33,42 +35,57 @@ fun HomeFragment(activity: ComponentActivity) {
         modifier = Modifier
             .fillMaxSize()
             .padding(30.dp),
-        verticalArrangement = Arrangement.spacedBy(30.dp)
+        verticalArrangement = Arrangement.spacedBy(30.dp, Alignment.CenterVertically)
     ) {
-        Column(
+        Spacer(modifier = Modifier.weight(0.2f))
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.Start)
+                .weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterHorizontally)
         ) {
-            Text(text="Hello in", style= TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM))
-            Text(text="MedMemo", style= TextStyleProvider.provide(style = TextStyleOption.TITLE_LARGE))
-            Text(text="$username", style= TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM))
+            BlockButton(
+                text = "New memo",
+                onClick = { activity.startActivity(
+                    Intent(
+                        activity, NewMemoActivity::class.java
+                    )
+                ) },
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            )
+            BlockButton(
+                text = "Manage memos",
+                onClick = { Toast.makeText(activity, "New memo", Toast.LENGTH_LONG).show() },
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            )
         }
-        Spacer(modifier = Modifier.weight(1f))
 
-        BlockButton(
-            text = "New memo",
-            onClick = { activity.startActivity(
-                Intent(
-                    activity, NewMemoActivity::class.java
-                )
-            ) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        BlockButton(
-            text = "Manage memos",
-            onClick = { Toast.makeText(activity, "New memo", Toast.LENGTH_LONG).show() },
-            modifier = Modifier.fillMaxWidth()
-        )
-        BlockButton(
-            text = "Read my CMI",
-            onClick = { Toast.makeText(activity, "New memo", Toast.LENGTH_LONG).show() },
-            modifier = Modifier.fillMaxWidth()
-        )
-        BlockButton(
-            text = "Help",
-            onClick = { Toast.makeText(activity, "New memo", Toast.LENGTH_LONG).show() },
-            modifier = Modifier.fillMaxWidth()
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterHorizontally)
+        ) {
+            BlockButton(
+                text = "Read my CMI",
+                onClick = { Toast.makeText(activity, "New memo", Toast.LENGTH_LONG).show() },
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            )
+            BlockButton(
+                text = "Help",
+                onClick = { Toast.makeText(activity, "New memo", Toast.LENGTH_LONG).show() },
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            )
+        }
+        Spacer(modifier = Modifier.weight(0.2f))
+
     }
 }

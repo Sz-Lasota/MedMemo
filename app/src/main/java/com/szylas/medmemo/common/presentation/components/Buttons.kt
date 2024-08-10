@@ -1,5 +1,6 @@
 package com.szylas.medmemo.common.presentation.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -10,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -123,8 +125,10 @@ fun BlockButton(
     ) {
         Text(
             modifier = Modifier
-                .align(Alignment.CenterVertically),
+                .align(Alignment.CenterVertically)
+                .fillMaxWidth(),
             text = text,
+            textAlign = TextAlign.Center,
             style = TextStyle(
                 fontStyle = MaterialTheme.typography.labelMedium.fontStyle,
                 fontSize = MaterialTheme.typography.labelMedium.fontSize,
