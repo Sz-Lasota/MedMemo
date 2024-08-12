@@ -2,10 +2,10 @@ package com.szylas.medmemo.memo.domain.managers
 
 import com.szylas.medmemo.auth.domain.Session
 import com.szylas.medmemo.common.domain.models.Memo
-import com.szylas.medmemo.memo.datastore.IMemoSaver
+import com.szylas.medmemo.memo.datastore.IMemoRepository
 
 class MemoManager(
-    private val saver: IMemoSaver
+    private val saver: IMemoRepository
 ) {
 
     suspend fun saveMemo(
@@ -51,6 +51,19 @@ class MemoManager(
         }
 
         saver.updateMemo(memo = memo, user = user, onSuccess = onSuccess, onError = onError)
+    }
+
+    suspend fun loadActive(
+        onSuccess: (List<Memo>) -> Unit,
+        onError: (String) -> Unit,
+        onSessionNotFound: () -> Unit
+    ) {
+        val user = Session.user()
+        if (user == null) {
+            onSessionNotFound()
+            return
+        }
+        saver.loadActive(user, onSuccess, onError)
     }
 
 

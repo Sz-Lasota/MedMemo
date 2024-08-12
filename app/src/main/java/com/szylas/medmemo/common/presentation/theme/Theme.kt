@@ -1,4 +1,4 @@
-package com.szylas.medmemo.ui.ui.theme
+ package com.szylas.medmemo.ui.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

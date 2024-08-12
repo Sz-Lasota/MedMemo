@@ -45,6 +45,11 @@
         <activity
             android:name=".memo.presentation.MemoTakenActivity"
             android:parentActivityName=".main.presentation.MainActivity" />
+        <activity
+            android:name=".memo.presentation.ManageMemoActivity"
+            android:exported="false"
+            android:label="@string/managememoactivity"
+            android:theme="@style/Theme.MedMemo" />
 
         <receiver
             android:name=".memo.domain.notifications.MemoNotificationReceiver"

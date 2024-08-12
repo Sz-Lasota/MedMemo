@@ -16,20 +16,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.traceEventStart
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.szylas.medmemo.R
 import com.szylas.medmemo.common.presentation.components.BlockButton
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
+import com.szylas.medmemo.memo.presentation.ManageMemoActivity
 import com.szylas.medmemo.memo.presentation.NewMemoActivity
 
 
 @Composable
 fun HomeFragment(activity: ComponentActivity) {
-    val username by remember {
-        mutableStateOf(activity.intent.getStringExtra("USER_NAME"))
-    }
 
     Column(
         modifier = Modifier
@@ -45,7 +46,7 @@ fun HomeFragment(activity: ComponentActivity) {
             horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterHorizontally)
         ) {
             BlockButton(
-                text = "New memo",
+                text = stringResource(R.string.new_memo),
                 onClick = { activity.startActivity(
                     Intent(
                         activity, NewMemoActivity::class.java
@@ -56,8 +57,8 @@ fun HomeFragment(activity: ComponentActivity) {
                     .fillMaxHeight()
             )
             BlockButton(
-                text = "Manage memos",
-                onClick = { Toast.makeText(activity, "New memo", Toast.LENGTH_LONG).show() },
+                text = stringResource(R.string.manage_memos),
+                onClick = { activity.startActivity(Intent(activity, ManageMemoActivity::class.java)) },
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()

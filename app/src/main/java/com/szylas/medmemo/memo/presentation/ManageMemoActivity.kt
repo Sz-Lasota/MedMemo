@@ -2,18 +2,34 @@ package com.szylas.medmemo.memo.presentation
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -21,90 +37,44 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import com.szylas.medmemo.R
+import com.szylas.medmemo.common.domain.formatters.formatFullDate
+import com.szylas.medmemo.common.domain.formatters.formatTime
 import com.szylas.medmemo.common.domain.models.Memo
+import com.szylas.medmemo.common.presentation.components.ErrorButton
+import com.szylas.medmemo.common.presentation.components.SecondaryButton
+import com.szylas.medmemo.common.presentation.style.TextStyleOption
+import com.szylas.medmemo.common.presentation.style.TextStyleProvider
+import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
 import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
 import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
-
-val mockedList = listOf(
-    Memo(
-        name = "First",
-        numberOfDoses = 0,
-        smartMode = false,
-        dosageTime = listOf(4 * 60 + 35, 12 * 60 + 35, 20 * 60 + 35),
-        startDate = Calendar.getInstance(),
-        finishDate = Calendar.getInstance().also {
-            it.add(Calendar.DATE, 14)
-        }
-    ),
-    Memo(
-        name = "Second",
-        numberOfDoses = 4,
-        smartMode = true,
-        dosageTime = listOf(12 * 60 + 35, 20 * 60 + 35),
-        startDate = Calendar.getInstance(),
-    ),
-    Memo(
-        name = "First",
-        numberOfDoses = 4,
-        smartMode = false,
-        dosageTime = listOf(4 * 60 + 35, 12 * 60 + 35, 20 * 60 + 35),
-        startDate = Calendar.getInstance(),
-        finishDate = Calendar.getInstance().also {
-            it.add(Calendar.DATE, 14)
-        }
-    ),
-    Memo(
-        name = "Second",
-        numberOfDoses = 4,
-        smartMode = true,
-        dosageTime = listOf(12 * 60 + 35, 20 * 60 + 35),
-        startDate = Calendar.getInstance(),
-    ),
-    Memo(
-        name = "First",
-        numberOfDoses = 4,
-        smartMode = false,
-        dosageTime = listOf(4 * 60 + 35, 12 * 60 + 35, 20 * 60 + 35),
-        startDate = Calendar.getInstance(),
-        finishDate = Calendar.getInstance().also {
-            it.add(Calendar.DATE, 14)
-        }
-    ),
-    Memo(
-        name = "Second",
-        numberOfDoses = 4,
-        smartMode = true,
-        dosageTime = listOf(12 * 60 + 35, 20 * 60 + 35),
-        startDate = Calendar.getInstance(),
-    ),
-    Memo(
-        name = "First",
-        numberOfDoses = 4,
-        smartMode = false,
-        dosageTime = listOf(4 * 60 + 35, 12 * 60 + 35, 20 * 60 + 35),
-        startDate = Calendar.getInstance(),
-        finishDate = Calendar.getInstance().also {
-            it.add(Calendar.DATE, 14)
-        }
-    ),
-    Memo(
-        name = "Second",
-        numberOfDoses = 4,
-        smartMode = true,
-        dosageTime = listOf(12 * 60 + 35, 20 * 60 + 35),
-        startDate = Calendar.getInstance(),
-    ),
-)
+// TODO:Fix this issues:
+//  1. Prolong memos and schedule new reminders!
+//  2. When deleting memos, cancel pending notifications
 
 
 class ManageMemoActivity : ComponentActivity() {
+
+    private val memoManager = MemoManagerProvider.memoManager
+
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,16 +114,263 @@ class ManageMemoActivity : ComponentActivity() {
                         }
                     })
                 }) { innerPadding ->
+                    var memos: List<Memo> by remember {
+                        mutableStateOf(listOf())
+                    }
+                    var loaded by remember {
+                        mutableStateOf(false)
+                    }
+                    var error by remember {
+                        mutableStateOf("")
+                    }
+
+                    var currentExpanded: Int? by remember {
+                        mutableStateOf(null)
+                    }
+                    lifecycleScope.loadActive(
+                        onSuccess = {
+                            memos = it
+                            loaded = true
+                        }, onError = {
+                            error = it
+                            loaded = true
+                        },
+                        onSessionNotFound = {
+                            error = "Session not found, log in and try again!"
+                            loaded = true
+                        })
+
                     Box(
                         modifier = Modifier
                             .padding(innerPadding)
                             .fillMaxSize()
                     ) {
-
+                        if (!loaded) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.width(64.dp),
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                )
+                            }
+                        } else if (error.isNotBlank()) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = "Error occurred: $error",
+                                    style = TextStyleProvider.provide(
+                                        style = TextStyleOption.TITLE_LARGE
+                                    ),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                itemsIndexed(memos) { index, item ->
+                                    if (currentExpanded != null && index == currentExpanded) {
+                                        ExpandedMemoItem(
+                                            memo = item,
+                                            onProlongClick = { Log.d("Prolong", it.name) },
+                                            onDeleteClick = { memo ->
+                                                lifecycleScope.remove(memo, onSuccess = {
+                                                    memos = mutableListOf<Memo>().also { list ->
+                                                        list.addAll(memos)
+                                                        list.remove(memo)
+                                                    }.toList()
+                                                    Toast.makeText(
+                                                        this@ManageMemoActivity,
+                                                        it,
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }, onError = {
+                                                    Toast.makeText(
+                                                        this@ManageMemoActivity,
+                                                        it,
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }, onSessionNotFound = {
+                                                    Toast.makeText(
+                                                        this@ManageMemoActivity,
+                                                        "Session not found, log in and try again!",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                })
+                                            }
+                                        )
+                                    } else {
+                                        FoldedMemoItem(
+                                            memo = item,
+                                            onClick = { currentExpanded = index },
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    }
+                                }
+                            }
+                        }
 
                     }
                 }
             }
         }
+    }
+
+    @Composable
+    fun ExpandedMemoItem(
+        memo: Memo,
+        onProlongClick: (Memo) -> Unit,
+        onDeleteClick: (Memo) -> Unit,
+        modifier: Modifier = Modifier
+    ) {
+        Column(
+            modifier = modifier
+                .padding(10.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                text = memo.name,
+                style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            HorizontalDivider(modifier = Modifier.fillMaxWidth())
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(MaterialTheme.colorScheme.secondary)
+                    .padding(15.dp)
+            ) {
+                Text(
+                    text = "Reminder mode:",
+                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = if (memo.smartMode) "Smart" else "Strict",
+                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(MaterialTheme.colorScheme.secondary)
+                    .padding(15.dp)
+            ) {
+                Text(
+                    text = "Dosage hours:",
+                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+                )
+                Text(
+                    text = memo.dosageTime.map { formatTime(it) }.joinToString(separator = ", ")
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(MaterialTheme.colorScheme.secondary)
+                    .padding(15.dp)
+            ) {
+                Text(
+                    text = "Date range:",
+                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+                )
+
+                Text(
+                    text = if (memo.finishDate != null) "${formatFullDate(memo.startDate)} till ${
+                        formatFullDate(
+                            memo.finishDate!!
+                        )
+                    }" else "From ${formatFullDate(memo.startDate)}",
+                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+                    fontSize = 14.sp
+                )
+
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                ErrorButton(
+                    text = stringResource(id = R.string.remove),
+                    onClick = { onDeleteClick(memo) },
+                    modifier.weight(1f)
+                )
+                SecondaryButton(
+                    text = "Prolong",
+                    onClick = { onProlongClick(memo) },
+                    modifier.weight(1f)
+                )
+            }
+
+        }
+    }
+
+    @Composable
+    fun FoldedMemoItem(memo: Memo, onClick: () -> Unit, modifier: Modifier = Modifier) {
+        Row(
+            modifier = modifier
+                .padding(10.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(MaterialTheme.colorScheme.secondary)
+                .padding(20.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                Text(
+                    text = memo.name,
+                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM)
+                )
+                Text(
+                    text = if (memo.finishDate != null) "${formatFullDate(memo.startDate)} till ${
+                        formatFullDate(
+                            memo.finishDate!!
+                        )
+                    }" else "From ${formatFullDate(memo.startDate)}",
+                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+                    fontSize = 14.sp
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = onClick, modifier = Modifier.fillMaxHeight()) {
+                Icon(imageVector = Icons.Filled.KeyboardArrowDown, contentDescription = "Expand")
+            }
+        }
+    }
+
+
+    fun CoroutineScope.remove(
+        memo: Memo,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+        onSessionNotFound: () -> Unit
+    ) = launch {
+        memoManager.deleteMemo(memo, onSuccess, onError, onSessionNotFound)
+    }
+
+    fun CoroutineScope.loadActive(
+        onSuccess: (List<Memo>) -> Unit,
+        onError: (String) -> Unit,
+        onSessionNotFound: () -> Unit
+    ) = launch {
+        memoManager.loadActive(onSuccess, onError, onSessionNotFound)
     }
 }

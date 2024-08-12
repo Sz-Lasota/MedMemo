@@ -35,7 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.szylas.medmemo.R
-import com.szylas.medmemo.common.domain.formatters.timeString
+import com.szylas.medmemo.common.domain.formatters.formatTime
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.presentation.components.PrimaryButton
 import com.szylas.medmemo.common.presentation.components.SecondaryButton
@@ -121,7 +121,7 @@ fun MemoTimeFragment(
         ) {
             items(hours) {
                 ListItem(
-                    title = timeString(it),
+                    title = formatTime(it),
                     onEdit = { newHour ->
                         if (hours.contains(newHour)) {
                             Toast.makeText(

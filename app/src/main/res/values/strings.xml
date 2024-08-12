@@ -42,4 +42,7 @@
     <string name="edit">Edit</string>
     <string name="remember_to_take_your_med">Remember to take your med</string>
     <string name="profile">Profile</string>
+    <string name="new_memo">New memo</string>
+    <string name="manage_memos">Manage memos</string>
+    <string name="managememoactivity">ManageMemoActivity</string>
 </resources>

@@ -15,6 +15,7 @@ fun Memo.id(): String {
     return "${name}_${startDate.timeInMillis}"
 }
 
+
 fun Memo.generateNotifications() {
     val idBase = (Calendar.getInstance().timeInMillis % 100_000).toInt()
     var index = 0
