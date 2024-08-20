@@ -42,6 +42,7 @@ import com.szylas.medmemo.R
 import com.szylas.medmemo.auth.domain.Session
 import com.szylas.medmemo.auth.presentation.LoginActivity
 import com.szylas.medmemo.common.domain.models.Memo
+import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.common.presentation.components.PrimaryButton
 import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.components.TimePickerDialog
@@ -51,7 +52,10 @@ import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.memo.domain.extensions.getMemo
 import com.szylas.medmemo.memo.domain.extensions.getNotification
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
+import com.szylas.medmemo.memo.domain.notifications.NotificationsScheduler
 import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
+import com.szylas.medmemo.memo.domain.predictions.IPrediction
+import com.szylas.medmemo.memo.domain.predictions.WeightedAveragePrediction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -59,6 +63,7 @@ import java.util.Calendar
 class MemoTakenActivity : ComponentActivity() {
 
     private val memoManager = MemoManagerProvider.memoManager
+    private val notificationsScheduler = NotificationsScheduler(this)
 
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -79,23 +84,17 @@ class MemoTakenActivity : ComponentActivity() {
 
         setContent {
             MedMemoTheme {
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    topBar = {
-                        TopAppBar(title = {
-                            Text(
-                                text = stringResource(id = R.string.app_name),
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Medium,
-                            )
-
-                        }
+                Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+                    TopAppBar(title = {
+                        Text(
+                            text = stringResource(id = R.string.app_name),
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Medium,
                         )
-                    }
-                ) { innerPadding ->
+
+                    })
+                }) { innerPadding ->
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -118,23 +117,28 @@ class MemoTakenActivity : ComponentActivity() {
                             )
                             Spacer(modifier = Modifier.weight(1f))
                             PrimaryButton(text = "Med taken now", onClick = {
-                                val indexOfNotification = memo.notifications.indexOf(
-                                    memo.notifications.firstOrNull { it.notificationId == notification.notificationId }
-                                )
+                                val indexOfNotification =
+                                    memo.notifications.indexOf(memo.notifications.firstOrNull { it.notificationId == notification.notificationId })
                                 memo.notifications[indexOfNotification].intakeTime =
                                     Calendar.getInstance()
-                                lifecycleScope.updateMemo(memo, onSuccess = {
-                                    finish()
-                                }, onError = {
-                                    Toast.makeText(
-                                        this@MemoTakenActivity,
-                                        "Unable to save intake time: $it! Check your internet connection or try again later!",
-                                        Toast.LENGTH_SHORT,
-                                    ).show()
-                                },
-                                    onSessionNotFound = {
+
+                                lifecycleScope.rescheduleNotification(
+                                    memo,
+                                    notification,
+                                    WeightedAveragePrediction(),
+                                    onSuccess = {
+                                        finish()
+                                    }, onError = {
+                                        Toast.makeText(
+                                            this@MemoTakenActivity,
+                                            "Unable to save intake time: $it! Check your internet connection or try again later!",
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+                                    }, onSessionNotFound = {
                                         Log.e("SESSION", "Session not found")
-                                    })
+                                    }
+                                )
+
                                 Log.d("MED", "Taken now ${notification.date}")
                             }, modifier = Modifier.fillMaxWidth())
                             PrimaryButton(
@@ -152,26 +156,36 @@ class MemoTakenActivity : ComponentActivity() {
                                 onDismissRequest = { showTimePicker = false },
                                 confirmButton = {
                                     TextButton(onClick = {
-                                        val indexOfNotification = memo.notifications.indexOf(
-                                            memo.notifications.firstOrNull { it.notificationId == notification.notificationId }
-                                        )
+                                        val indexOfNotification = memo.notifications
+                                            .indexOf(memo.notifications
+                                                .firstOrNull { it.notificationId == notification.notificationId }
+                                            )
+
                                         memo.notifications[indexOfNotification].intakeTime =
                                             Calendar.getInstance().apply {
                                                 set(Calendar.HOUR_OF_DAY, timePickerState.hour)
                                                 set(Calendar.MINUTE, timePickerState.minute)
                                             }
-                                        lifecycleScope.updateMemo(memo, onSuccess = {
-                                            finish()
-                                        }, onError = {
-                                            Toast.makeText(
-                                                this@MemoTakenActivity,
-                                                "Unable to save intake time: $it! Check your internet connection or try again later!",
-                                                Toast.LENGTH_SHORT,
-                                            ).show()
-                                        },
+
+                                        lifecycleScope.rescheduleNotification(
+                                            memo,
+                                            notification,
+                                            WeightedAveragePrediction(),
+                                            onSuccess = {
+                                                finish()
+                                            },
+                                            onError = {
+                                                Toast.makeText(
+                                                    this@MemoTakenActivity,
+                                                    "Unable to save intake time: $it! Check your internet connection or try again later!",
+                                                    Toast.LENGTH_SHORT,
+                                                ).show()
+                                            },
                                             onSessionNotFound = {
                                                 Log.e("SESSION", "Session not found")
-                                            })
+                                            }
+                                        )
+
                                         showTimePicker = false
                                     }) {
                                         Text(
@@ -186,11 +200,11 @@ class MemoTakenActivity : ComponentActivity() {
                                         showTimePicker = false
                                     }) {
                                         Text(
-                                            text = stringResource(R.string.cancel),
-                                            fontSize = 18.sp
+                                            text = stringResource(R.string.cancel), fontSize = 18.sp
                                         )
                                     }
-                                }) {
+                                }
+                            ) {
                                 TimePicker(state = timePickerState)
                             }
 
@@ -199,6 +213,24 @@ class MemoTakenActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun CoroutineScope.rescheduleNotification(
+        memo: Memo,
+        lastNotification: MemoNotification,
+        prediction: IPrediction,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+        onSessionNotFound: (String) -> Unit
+    ) = launch {
+        notificationsScheduler.rescheduleNotifications(
+            memo,
+            lastNotification,
+            prediction,
+            onSuccess,
+            onError,
+            onSessionNotFound
+        )
     }
 
     private fun CoroutineScope.updateMemo(

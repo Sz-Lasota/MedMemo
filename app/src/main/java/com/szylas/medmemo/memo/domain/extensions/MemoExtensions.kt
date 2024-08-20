@@ -55,6 +55,7 @@ fun Memo.updateEndless(): MutableList<MemoNotification> {
 
 
 fun Memo.generateNotifications() {
+    // TODO: Rework id provider
     val idBase = (Calendar.getInstance().timeInMillis % 100_000).toInt()
     var idOffset = 0
     dosageTime.forEach { hour ->

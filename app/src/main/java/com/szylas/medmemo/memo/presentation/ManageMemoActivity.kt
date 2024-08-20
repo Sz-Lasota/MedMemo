@@ -61,6 +61,7 @@ import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
+import com.szylas.medmemo.memo.domain.notifications.NotificationsScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -73,6 +74,7 @@ import java.util.Calendar
 class ManageMemoActivity : ComponentActivity() {
 
     private val memoManager = MemoManagerProvider.memoManager
+    private val notificationsScheduler = NotificationsScheduler(this)
 
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -345,16 +347,17 @@ class ManageMemoActivity : ComponentActivity() {
     }
 
 
-    fun CoroutineScope.remove(
+    private fun CoroutineScope.remove(
         memo: Memo,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit,
         onSessionNotFound: () -> Unit
     ) = launch {
         memoManager.deleteMemo(memo, onSuccess, onError, onSessionNotFound)
+        notificationsScheduler.cancelNotifications(memo)
     }
 
-    fun CoroutineScope.loadActive(
+    private fun CoroutineScope.loadActive(
         onSuccess: (List<Memo>) -> Unit,
         onError: (String) -> Unit,
         onSessionNotFound: () -> Unit

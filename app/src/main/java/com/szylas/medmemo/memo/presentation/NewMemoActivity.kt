@@ -59,6 +59,7 @@ import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.memo.domain.extensions.generateNotifications
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
 import com.szylas.medmemo.memo.domain.notifications.MemoNotificationReceiver
+import com.szylas.medmemo.memo.domain.notifications.NotificationsScheduler
 import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
 import com.szylas.medmemo.memo.presentation.components.StatusBarManager
 import com.szylas.medmemo.memo.presentation.models.MemoDateScreen
@@ -77,6 +78,8 @@ class NewMemoActivity : ComponentActivity() {
 
     // TODO: abstract creation
     private val memoManager = MemoManagerProvider.memoManager
+
+    private val notificationsScheduler = NotificationsScheduler(this)
 
     private val statusManager = StatusBarManager(
         items = listOf(
@@ -186,7 +189,7 @@ class NewMemoActivity : ComponentActivity() {
                                         memo = memo,
                                         onSuccess = {
                                             Log.d("MEMO_PERSIST", "Success")
-                                            scheduleNotifications(memo)
+                                            notificationsScheduler.scheduleNotifications(memo)
                                             modalShow = true
                                         },
                                         onError = {
