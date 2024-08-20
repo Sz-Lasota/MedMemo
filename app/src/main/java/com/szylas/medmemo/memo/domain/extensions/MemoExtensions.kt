@@ -15,15 +15,52 @@ fun Memo.id(): String {
     return "${name}_${startDate.timeInMillis}"
 }
 
+fun Memo.updateEndless(): MutableList<MemoNotification> {
+    if (finishDate != null) {
+        throw RuntimeException("This is not endless memo!")
+    }
+    val idBase = (Calendar.getInstance().timeInMillis % 100_000).toInt()
+    var idOffset = 0
+
+    val stopDate = Calendar.getInstance().apply {
+        add(Calendar.DATE, 7)
+    }
+
+    val notificationsMap = notifications.groupBy { it.baseDosageTime }.toMutableMap()
+    val newNotifications: MutableList<MemoNotification> = mutableListOf()
+
+    notificationsMap.forEach { (hour, memoNotifications) ->
+        val newestNotificationDate = Calendar.getInstance().apply { timeInMillis = memoNotifications.maxOf { it.date }.timeInMillis }
+
+        newestNotificationDate.set(Calendar.HOUR_OF_DAY, hour / 60)
+        newestNotificationDate.set(Calendar.MINUTE, hour % 60)
+
+        while (newestNotificationDate.before(stopDate)) {
+            newestNotificationDate.add(Calendar.DATE, 1)
+            val notify = MemoNotification(
+                name = name,
+                baseDosageTime = hour,
+                date = Calendar.getInstance().apply { timeInMillis = newestNotificationDate.timeInMillis },
+                notificationId = idBase + idOffset
+            )
+            idOffset++
+            newNotifications.add(notify)
+        }
+    }
+
+    notifications.addAll(newNotifications)
+    return newNotifications
+
+}
+
 
 fun Memo.generateNotifications() {
     val idBase = (Calendar.getInstance().timeInMillis % 100_000).toInt()
-    var index = 0
+    var idOffset = 0
     dosageTime.forEach { hour ->
         val date = Calendar.getInstance().apply {
             timeInMillis = startDate.timeInMillis
         }
-
 
         val now = Calendar.getInstance()
         if (finishDate != null) {
@@ -35,27 +72,28 @@ fun Memo.generateNotifications() {
                 }
                 if (notifiyDate.before(now)) {
                     date.add(Calendar.DATE, 1)
-                    index++
+                    idOffset++
                     continue
                 }
                 notifications.add(
                     MemoNotification(
                         date = notifiyDate,
+                        baseDosageTime = hour,
                         name = name,
-                        notificationId = idBase + index
+                        notificationId = idBase + idOffset
                     )
                 )
                 date.add(Calendar.DATE, 1)
-                index++
+                idOffset++
             }
             notifications.add(MemoNotification(date = Calendar.getInstance().apply {
                 timeInMillis = date.timeInMillis
                 set(Calendar.HOUR_OF_DAY, hour / 60)
                 set(Calendar.MINUTE, hour % 60)
-            }, name = name, notificationId = idBase + index))
-            index++
+            }, name = name, notificationId = idBase + idOffset))
+            idOffset++
         } else {
-            for (i in 1..14) {
+            for (i in 1..7) {
                 val notifiyDate = Calendar.getInstance().apply {
                     timeInMillis = date.timeInMillis
                     set(Calendar.HOUR_OF_DAY, hour / 60)
@@ -63,18 +101,19 @@ fun Memo.generateNotifications() {
                 }
                 if (notifiyDate.before(now)) {
                     date.add(Calendar.DATE, 1)
-                    index++
+                    idOffset++
                     continue
                 }
                 notifications.add(
                     MemoNotification(
                         date = notifiyDate,
+                        baseDosageTime = hour,
                         name = name,
-                        notificationId = idBase + index
+                        notificationId = idBase + idOffset
                     )
                 )
                 date.add(Calendar.DATE, 1)
-                index++
+                idOffset++
             }
         }
     }

@@ -45,7 +45,7 @@ fun MemoSummaryFragment(
                 softWrap = true
             )
             HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.outline
+                modifier = Modifier.fillMaxWidth()
             )
         }
         Text(

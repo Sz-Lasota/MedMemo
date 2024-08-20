@@ -1,7 +1,13 @@
 package com.szylas.medmemo.main.presentation
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -33,21 +39,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.szylas.medmemo.R
+import com.szylas.medmemo.auth.domain.Session
+import com.szylas.medmemo.common.domain.models.Memo
+import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.main.presentation.models.CalendarScreen
 import com.szylas.medmemo.main.presentation.models.HomeScreen
 import com.szylas.medmemo.main.presentation.models.NavBarItem
 import com.szylas.medmemo.common.presentation.style.NavBarItemStyleProvider
+import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.main.presentation.models.StatisticsScreen
 import com.szylas.medmemo.main.presentation.views.CalendarFragment
 import com.szylas.medmemo.main.presentation.views.HomeFragment
 import com.szylas.medmemo.main.presentation.views.ProfileFragment
+import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
+import com.szylas.medmemo.memo.domain.notifications.MemoNotificationReceiver
 import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
-import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
-import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -78,9 +91,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(Color.parseColor(AppBarBlackCode))
-        )
+        enableEdgeToEdge()
+
+        lifecycleScope.updateEndless(onSuccess = this::scheduleNotifications, onError = {
+            Toast.makeText(this, "Error when updating memos $it!", Toast.LENGTH_SHORT).show()
+        }, onSessionNotFound = { finish() })
 
         setContent {
             MedMemoTheme {
@@ -92,13 +107,7 @@ class MainActivity : ComponentActivity() {
 
 
                 Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-                    TopAppBar(colors = TopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onTertiary,
-                        scrolledContainerColor = MaterialTheme.colorScheme.surfaceDim,
-                        actionIconContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-                    ), title = {
+                    TopAppBar(title = {
                         Text(
                             text = stringResource(id = R.string.app_name),
                             modifier = Modifier
@@ -111,14 +120,12 @@ class MainActivity : ComponentActivity() {
                     })
                 }, bottomBar = {
                     NavigationBar(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp))
                     ) {
                         bottomNavItems.fastForEachIndexed { index, item ->
-                            NavigationBarItem(colors = NavBarItemStyleProvider.provide(),
+                            NavigationBarItem(
                                 selected = selectedBottomIndex == index,
                                 onClick = {
                                     selectedBottomIndex = index
@@ -152,9 +159,47 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
-
             }
         }
+    }
+
+    private fun scheduleNotifications(notifications: Map<Memo, List<MemoNotification>>) {
+        notifications.forEach { (memo, notificationList) ->
+            notificationList.forEach {
+                val intent =
+                    Intent(applicationContext, MemoNotificationReceiver::class.java).apply {
+                        putExtra("NOTIFICATION", it)
+                        putExtra("MEMO", memo)
+                    }
+
+                val pendingIntent = PendingIntent.getBroadcast(
+                    applicationContext,
+                    it.notificationId,
+                    intent,
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                )
+
+                val alarm = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+                Log.d(
+                    "SCHEDULE",
+                    "Notification (id: ${it.notificationId}, name: ${it.name}) scheduled at: ${it.date.timeInMillis}"
+                )
+
+                alarm.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP, it.date.timeInMillis, pendingIntent
+                )
+            }
+        }
+    }
+
+
+    private fun CoroutineScope.updateEndless(
+        onSuccess: (Map<Memo, List<MemoNotification>>) -> Unit,
+        onError: (String) -> Unit,
+        onSessionNotFound: () -> Unit
+    ) = launch {
+        MemoManagerProvider.memoManager.updateEndless(onSuccess, onError, onSessionNotFound)
     }
 
 }

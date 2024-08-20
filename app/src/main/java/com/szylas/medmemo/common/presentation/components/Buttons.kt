@@ -116,12 +116,7 @@ fun BlockButton(
         shape = RoundedCornerShape(cornerRadius),
         modifier = modifier
             .height(height),
-        colors = ButtonColors(
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            containerColor = MaterialTheme.colorScheme.primary,
-            disabledContentColor = MaterialTheme.colorScheme.tertiary,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceDim,
-        )
+
     ) {
         Text(
             modifier = Modifier
@@ -130,10 +125,10 @@ fun BlockButton(
             text = text,
             textAlign = TextAlign.Center,
             style = TextStyle(
-                fontStyle = MaterialTheme.typography.labelMedium.fontStyle,
-                fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                fontFamily = MaterialTheme.typography.labelMedium.fontFamily,
-                fontWeight = MaterialTheme.typography.labelMedium.fontWeight,
+                fontStyle = MaterialTheme.typography.titleLarge.fontStyle,
+                fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                fontFamily = MaterialTheme.typography.titleLarge.fontFamily,
+                fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
             ),
         )
     }
@@ -154,14 +149,14 @@ private fun ComposableButton(
         shape = RoundedCornerShape(cornerRadius),
         modifier = modifier
             .height(50.dp),
-        colors = buttonColors,
+//        colors = buttonColors,
         enabled = enabled
     ) {
         Text(
             modifier = Modifier
                 .align(Alignment.CenterVertically),
             text = text,
-            style = textStyle
+//            style = textStyle
         )
     }
 }

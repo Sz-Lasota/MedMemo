@@ -2,30 +2,12 @@ package com.szylas.medmemo.memo.datastore.mappers
 
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.domain.models.MemoNotification
-import java.io.Serializable
+import com.szylas.medmemo.memo.datastore.models.MemoEntity
+import com.szylas.medmemo.memo.datastore.models.MemoNotificationEntity
 import java.util.Calendar
 
-
-data class MemoFirestore(
-    var name: String = "",
-    var numberOfDoses: Int = 0,
-    var smartMode: Boolean = false,
-    var dosageTime: List<Int> = listOf(),
-    var startDate: Long = Calendar.getInstance().timeInMillis,
-    var finishDate: Long? = null,
-    var gap: Int = 0,
-    var notifications: MutableList<MemoNotificationFirestore> = mutableListOf()
-) : Serializable
-
-data class MemoNotificationFirestore(
-    val date: Long = Calendar.getInstance().timeInMillis,
-    val name: String = "",
-    var intakeTime: Calendar? = null,
-    val notificationId: Int = 0
-) : Serializable
-
-fun fromMemo(memo: Memo): MemoFirestore {
-    return MemoFirestore(
+fun fromMemo(memo: Memo): MemoEntity {
+    return MemoEntity(
         name = memo.name,
         numberOfDoses = memo.numberOfDoses,
         smartMode = memo.smartMode,
@@ -38,35 +20,37 @@ fun fromMemo(memo: Memo): MemoFirestore {
 
 }
 
-fun fromNotification(memoNotification: MemoNotification): MemoNotificationFirestore {
-    return MemoNotificationFirestore(
+fun fromNotification(memoNotification: MemoNotification): MemoNotificationEntity {
+    return MemoNotificationEntity(
         date = memoNotification.date.timeInMillis,
         name = memoNotification.name,
-        intakeTime = memoNotification.intakeTime,
+        baseDosageTime = memoNotification.baseDosageTime,
+        intakeTime = memoNotification.intakeTime?.timeInMillis,
         notificationId = memoNotification.notificationId,
     )
 }
 
-fun toNotification(memoNotificationFirestore: MemoNotificationFirestore): MemoNotification {
+fun toNotification(memoNotificationEntity: MemoNotificationEntity): MemoNotification {
     return MemoNotification(
-        date = Calendar.getInstance().apply { timeInMillis = memoNotificationFirestore.date },
-        name = memoNotificationFirestore.name,
-        intakeTime = memoNotificationFirestore.intakeTime,
-        notificationId = memoNotificationFirestore.notificationId,
+        date = Calendar.getInstance().apply { timeInMillis = memoNotificationEntity.date },
+        name = memoNotificationEntity.name,
+        baseDosageTime = memoNotificationEntity.baseDosageTime,
+        intakeTime = memoNotificationEntity.intakeTime?. let { intake -> Calendar.getInstance().apply { timeInMillis = intake}},
+        notificationId = memoNotificationEntity.notificationId,
     )
 }
 
-fun toMemo(memoFirestore: MemoFirestore): Memo {
+fun toMemo(memoEntity: MemoEntity): Memo {
     return Memo(
-        name = memoFirestore.name,
-        numberOfDoses = memoFirestore.numberOfDoses,
-        smartMode = memoFirestore.smartMode,
-        dosageTime = memoFirestore.dosageTime,
-        startDate = Calendar.getInstance().apply { timeInMillis = memoFirestore.startDate },
-        finishDate = memoFirestore.finishDate?.let {
+        name = memoEntity.name,
+        numberOfDoses = memoEntity.numberOfDoses,
+        smartMode = memoEntity.smartMode,
+        dosageTime = memoEntity.dosageTime,
+        startDate = Calendar.getInstance().apply { timeInMillis = memoEntity.startDate },
+        finishDate = memoEntity.finishDate?.let {
             Calendar.getInstance().apply { timeInMillis = it }
         },
-        gap = memoFirestore.gap,
-        notifications = memoFirestore.notifications.map { toNotification(it) }.toMutableList()
+        gap = memoEntity.gap,
+        notifications = memoEntity.notifications.map { toNotification(it) }.toMutableList()
     )
 }

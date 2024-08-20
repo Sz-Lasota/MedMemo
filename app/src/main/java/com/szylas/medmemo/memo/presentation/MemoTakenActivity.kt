@@ -47,12 +47,11 @@ import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.components.TimePickerDialog
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
+import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.memo.domain.extensions.getMemo
 import com.szylas.medmemo.memo.domain.extensions.getNotification
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
 import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
-import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
-import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -68,7 +67,6 @@ class MemoTakenActivity : ComponentActivity() {
 
         registerNotificationChannel(this)
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(Color.parseColor(AppBarBlackCode))
         )
 
         val user = Session.user()
@@ -85,18 +83,11 @@ class MemoTakenActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxSize(),
                     topBar = {
-                        TopAppBar(colors = TopAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            titleContentColor = MaterialTheme.colorScheme.onTertiary,
-                            scrolledContainerColor = MaterialTheme.colorScheme.surfaceDim,
-                            actionIconContentColor = MaterialTheme.colorScheme.onSurface,
-                            navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-                        ), title = {
+                        TopAppBar(title = {
                             Text(
                                 text = stringResource(id = R.string.app_name),
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surface),
+                                    .fillMaxWidth(),
                                 textAlign = TextAlign.Center,
                                 fontWeight = FontWeight.Medium,
                             )

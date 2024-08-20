@@ -93,6 +93,7 @@ fun ProfileListItem(item: ProfileItem, activity: ComponentActivity, modifier: Mo
             .clickable {
                 Toast.makeText(activity, "Hello from ${item.label}", Toast.LENGTH_SHORT).show()
 //                activity.startActivity(Intent(activity, item.destination))
+                activity.finish()
             },
         horizontalArrangement = Arrangement.End
     ) {

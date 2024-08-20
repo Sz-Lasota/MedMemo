@@ -45,10 +45,9 @@ import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.components.TextInput
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
+import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.main.presentation.MainActivity
 import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
-import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
-import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -75,7 +74,6 @@ class LoginActivity : ComponentActivity() {
         }
 
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(Color.parseColor(AppBarBlackCode))
         )
         setContent {
             MedMemoTheme {

@@ -37,8 +37,7 @@ import com.szylas.medmemo.common.presentation.components.PrimaryButton
 import com.szylas.medmemo.common.presentation.components.TextInput
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
-import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
-import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
+import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -57,7 +56,6 @@ class RegisterActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(Color.parseColor(AppBarBlackCode))
         )
         setContent {
             MedMemoTheme {

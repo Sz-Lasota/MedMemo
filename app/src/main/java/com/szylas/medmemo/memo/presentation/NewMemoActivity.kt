@@ -55,6 +55,7 @@ import com.szylas.medmemo.R
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
+import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.memo.domain.extensions.generateNotifications
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
 import com.szylas.medmemo.memo.domain.notifications.MemoNotificationReceiver
@@ -68,8 +69,6 @@ import com.szylas.medmemo.memo.presentation.views.MemoDateFragment
 import com.szylas.medmemo.memo.presentation.views.MemoNameFragment
 import com.szylas.medmemo.memo.presentation.views.MemoSummaryFragment
 import com.szylas.medmemo.memo.presentation.views.MemoTimeFragment
-import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
-import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -103,25 +102,17 @@ class NewMemoActivity : ComponentActivity() {
         registerNotificationChannel(this)
 
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(Color.parseColor(AppBarBlackCode))
         )
 
         setContent {
             val navController = rememberNavController()
             MedMemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-                    TopAppBar(colors = TopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onTertiary,
-                        scrolledContainerColor = MaterialTheme.colorScheme.surfaceDim,
-                        actionIconContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-                    ), title = {
+                    TopAppBar(title = {
                         Text(
                             text = stringResource(id = R.string.app_name),
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.surface),
+                                .fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Medium,
                         )

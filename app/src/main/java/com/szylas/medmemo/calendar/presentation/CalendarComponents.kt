@@ -99,14 +99,14 @@ fun DaySchedule(activity: ComponentActivity, scheduledEvents: List<TreatmentSche
 fun EventHeader(eventTitle: String, modifier: Modifier) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(34.dp))
-            .background(MaterialTheme.colorScheme.secondary),
+            .clip(RoundedCornerShape(34.dp)),
+//            .background(MaterialTheme.colorScheme.secondary),
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
             text = eventTitle,
             style = TextStyleProvider.provide(style = TextStyleOption.TITLE_LARGE),
-            color = MaterialTheme.colorScheme.onSecondary,
+//            color = MaterialTheme.colorScheme.onSecondary,
             textAlign = TextAlign.Center,
         )
     }
@@ -116,8 +116,8 @@ fun EventHeader(eventTitle: String, modifier: Modifier) {
 fun EventTile(activity: ComponentActivity, event: TreatmentModel, modifier: Modifier = Modifier) {
     Button(
         modifier = modifier
-            .clip(RoundedCornerShape(24.dp))
-            .background(MaterialTheme.colorScheme.primary),
+            .clip(RoundedCornerShape(24.dp)),
+//            .background(MaterialTheme.colorScheme.primary),
         onClick = { Toast.makeText(activity, event.title, Toast.LENGTH_LONG).show() },
     ) {
         Row(
@@ -129,7 +129,7 @@ fun EventTile(activity: ComponentActivity, event: TreatmentModel, modifier: Modi
             Text(
                 text = event.title,
                 style = TextStyleProvider.provide(style = TextStyleOption.LABEL_LARGE),
-                color = MaterialTheme.colorScheme.onPrimary
+//                color = MaterialTheme.colorScheme.onPrimary
             )
             Spacer(modifier = Modifier.weight(1f))
         }
@@ -143,11 +143,11 @@ fun DateTile(day: String, month: String, active: Boolean, onClick: () -> Unit) {
             .width(80.dp)
             .height(70.dp), border = BorderStroke(
             1.dp,
-            if (active) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+            if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondary
         ), shape = RoundedCornerShape(20.dp), colors = ButtonColors(
-            containerColor = if (active) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = if (active) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onTertiary,
-            disabledContainerColor = if (active) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondary,
+            contentColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondary,
+            disabledContainerColor = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
             disabledContentColor = MaterialTheme.colorScheme.onPrimary,
         )
     ) {
@@ -159,12 +159,12 @@ fun DateTile(day: String, month: String, active: Boolean, onClick: () -> Unit) {
             Text(
                 text = day,
                 style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
-                color = if (active) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onTertiary
+//                color = if (active) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onTertiary
             )
             Text(
                 text = month,
                 style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
-                color = if (active) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onTertiary
+//                color = if (active) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onTertiary
             )
         }
     }

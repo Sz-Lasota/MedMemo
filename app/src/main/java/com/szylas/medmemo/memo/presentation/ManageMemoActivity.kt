@@ -59,9 +59,8 @@ import com.szylas.medmemo.common.presentation.components.ErrorButton
 import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
+import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
-import com.szylas.medmemo.ui.ui.theme.AppBarBlackCode
-import com.szylas.medmemo.ui.ui.theme.MedMemoTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -82,24 +81,16 @@ class ManageMemoActivity : ComponentActivity() {
 
 
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(Color.parseColor(AppBarBlackCode))
         )
 
         setContent {
             MedMemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-                    TopAppBar(colors = TopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.onTertiary,
-                        scrolledContainerColor = MaterialTheme.colorScheme.surfaceDim,
-                        actionIconContentColor = MaterialTheme.colorScheme.onSurface,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-                    ), title = {
+                    TopAppBar(title = {
                         Text(
                             text = stringResource(id = R.string.app_name),
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.surface),
+                                .fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Medium,
                         )
@@ -154,8 +145,6 @@ class ManageMemoActivity : ComponentActivity() {
                             ) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.width(64.dp),
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
                                 )
                             }
                         } else if (error.isNotBlank()) {
@@ -237,31 +226,30 @@ class ManageMemoActivity : ComponentActivity() {
             modifier = modifier
                 .padding(10.dp)
                 .clip(RoundedCornerShape(14.dp))
-                .background(MaterialTheme.colorScheme.primary)
+                .background(MaterialTheme.colorScheme.primaryContainer)
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
                 text = memo.name,
-                style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM),
-                color = MaterialTheme.colorScheme.onPrimary
+                style = MaterialTheme.typography.titleMedium,
             )
             HorizontalDivider(modifier = Modifier.fillMaxWidth())
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
-                    .background(MaterialTheme.colorScheme.secondary)
+                    .background(MaterialTheme.colorScheme.inversePrimary)
                     .padding(15.dp)
             ) {
                 Text(
                     text = "Reminder mode:",
-                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+                    style = MaterialTheme.typography.labelLarge,
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = if (memo.smartMode) "Smart" else "Strict",
-                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
 
@@ -269,12 +257,12 @@ class ManageMemoActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
-                    .background(MaterialTheme.colorScheme.secondary)
+                    .background(MaterialTheme.colorScheme.inversePrimary)
                     .padding(15.dp)
             ) {
                 Text(
                     text = "Dosage hours:",
-                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+                    style = MaterialTheme.typography.labelLarge,
                 )
                 Text(
                     text = memo.dosageTime.map { formatTime(it) }.joinToString(separator = ", ")
@@ -284,12 +272,12 @@ class ManageMemoActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
-                    .background(MaterialTheme.colorScheme.secondary)
+                    .background(MaterialTheme.colorScheme.inversePrimary)
                     .padding(15.dp)
             ) {
                 Text(
                     text = "Date range:",
-                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+                    style = MaterialTheme.typography.labelLarge,
                 )
 
                 Text(
@@ -298,7 +286,7 @@ class ManageMemoActivity : ComponentActivity() {
                             memo.finishDate!!
                         )
                     }" else "From ${formatFullDate(memo.startDate)}",
-                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+                    style = MaterialTheme.typography.labelLarge,
                     fontSize = 14.sp
                 )
 
@@ -329,7 +317,7 @@ class ManageMemoActivity : ComponentActivity() {
             modifier = modifier
                 .padding(10.dp)
                 .clip(RoundedCornerShape(14.dp))
-                .background(MaterialTheme.colorScheme.secondary)
+                .background(MaterialTheme.colorScheme.tertiaryContainer)
                 .padding(20.dp)
         ) {
             Column(
@@ -337,7 +325,7 @@ class ManageMemoActivity : ComponentActivity() {
             ) {
                 Text(
                     text = memo.name,
-                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM)
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Text(
                     text = if (memo.finishDate != null) "${formatFullDate(memo.startDate)} till ${
@@ -345,7 +333,7 @@ class ManageMemoActivity : ComponentActivity() {
                             memo.finishDate!!
                         )
                     }" else "From ${formatFullDate(memo.startDate)}",
-                    style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+                    style = MaterialTheme.typography.labelLarge,
                     fontSize = 14.sp
                 )
             }
