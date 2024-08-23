@@ -1,15 +1,12 @@
 package com.szylas.medmemo.memo.presentation
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,13 +15,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -122,7 +117,7 @@ class MemoTakenActivity : ComponentActivity() {
                                 memo.notifications[indexOfNotification].intakeTime =
                                     Calendar.getInstance()
 
-                                lifecycleScope.rescheduleNotification(
+                                lifecycleScope.medTaken(
                                     memo,
                                     notification,
                                     WeightedAveragePrediction(),
@@ -167,7 +162,7 @@ class MemoTakenActivity : ComponentActivity() {
                                                 set(Calendar.MINUTE, timePickerState.minute)
                                             }
 
-                                        lifecycleScope.rescheduleNotification(
+                                        lifecycleScope.medTaken(
                                             memo,
                                             notification,
                                             WeightedAveragePrediction(),
@@ -215,7 +210,7 @@ class MemoTakenActivity : ComponentActivity() {
         }
     }
 
-    private fun CoroutineScope.rescheduleNotification(
+    private fun CoroutineScope.medTaken(
         memo: Memo,
         lastNotification: MemoNotification,
         prediction: IPrediction,
@@ -223,22 +218,11 @@ class MemoTakenActivity : ComponentActivity() {
         onError: (String) -> Unit,
         onSessionNotFound: (String) -> Unit
     ) = launch {
-        notificationsScheduler.rescheduleNotifications(
-            memo,
-            lastNotification,
-            prediction,
-            onSuccess,
-            onError,
-            onSessionNotFound
-        )
+        if (memo.smartMode) {
+            notificationsScheduler.rescheduleNotifications(memo, lastNotification, prediction, onSuccess, onError, onSessionNotFound)
+        } else {
+            memoManager.updateMemo(memo, onSuccess, onError, onSessionNotFound)
+        }
     }
 
-    private fun CoroutineScope.updateMemo(
-        memo: Memo,
-        onSuccess: (String) -> Unit,
-        onError: (String) -> Unit,
-        onSessionNotFound: (String) -> Unit
-    ) = launch {
-        memoManager.updateMemo(memo, onSuccess, onError, onSessionNotFound)
-    }
 }

@@ -42,11 +42,6 @@ class NotificationsScheduler(private val context: Context) {
             .filter { it.notificationId != lastNotification.notificationId }
             .minBy { it.date }
 
-        Log.d(
-            "Pending notification",
-            "Pending notification (id: ${pendingNotification.notificationId}) at: ${pendingNotification.date.timeInMillis}, Last notification ,\n" +
-                    "\"Pending notification (id: ${pendingNotification.notificationId}) at: ${pendingNotification.date.timeInMillis}."
-        )
 
         cancelAlarm(memo, pendingNotification)
         val previousData = memo.notifications
