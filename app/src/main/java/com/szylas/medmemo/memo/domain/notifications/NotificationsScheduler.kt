@@ -4,8 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.gesture.Prediction
-import android.util.Log
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
