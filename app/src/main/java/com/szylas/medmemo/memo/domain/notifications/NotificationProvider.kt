@@ -10,12 +10,12 @@ import com.szylas.medmemo.R
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.memo.datastore.NotificationStore
-import com.szylas.medmemo.memo.presentation.MemoTakenActivity
+import com.szylas.medmemo.memo.presentation.MemoTakenFromNotificationActivity
 
 class NotificationProvider {
 
     fun provide(memo: Memo, memoNotification: MemoNotification, context: Context): Notification {
-        val intent = Intent(context, MemoTakenActivity::class.java).apply {
+        val intent = Intent(context, MemoTakenFromNotificationActivity::class.java).apply {
             putExtra("NOTIFICATION", memoNotification)
             putExtra("MEMO", memo)
         }

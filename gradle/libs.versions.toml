@@ -6,7 +6,7 @@ activityComposeVersion = "1.9.1"
 #noinspection AndroidGradlePluginVersion
 agp = "8.5.1"
 firebaseAnalytics = "22.0.2"
-firebaseBom = "33.1.2"
+firebaseBom = "33.2.0"
 kotlin = "1.9.0"
 #noinspection GradleDependency
 coreKtx = "1.10.1"
@@ -21,10 +21,8 @@ appcompat = "1.6.1"
 material = "1.10.0"
 #noinspection GradleDependency
 lifecycleRuntimeKtx = "2.6.1"
-#noinspection GradleDependency
-activityCompose = "1.8.0"
-#noinspection GradleDependency
-composeBom = "2024.04.01"
+activityCompose = "1.9.1"
+composeBom = "2024.08.00"
 navigationCompose = "2.7.7"
 #noinspection GradleDependency
 composeNavigation = "2.8.0-alpha08"

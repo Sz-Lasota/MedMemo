@@ -14,7 +14,7 @@ import java.util.Calendar
 
 class NotificationsScheduler(private val context: Context) {
 
-    val memoManager = MemoManagerProvider.memoManager
+    private val memoManager = MemoManagerProvider.memoManager
 
     fun scheduleNotifications(memo: Memo) {
         memo.notifications.forEach {
@@ -26,6 +26,10 @@ class NotificationsScheduler(private val context: Context) {
         memo.notifications.filter { it.intakeTime == null }.forEach {
             cancelAlarm(memo, it)
         }
+    }
+
+    fun cancelNotification(memo: Memo, notification: MemoNotification) {
+        cancelAlarm(memo, notification)
     }
 
     suspend fun rescheduleNotifications(

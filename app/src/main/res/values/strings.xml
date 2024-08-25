@@ -45,4 +45,17 @@
     <string name="new_memo">New memo</string>
     <string name="manage_memos">Manage memos</string>
     <string name="managememoactivity">ManageMemoActivity</string>
+    <string name="see_more">See more</string>
+    <string name="current_memos">Current memos</string>
+    <string name="ends_on">Ends on: %1$s</string>
+    <string name="endless">Endless</string>
+    <string name="there_are_no_upcoming_notifications">There are no upcoming notifications</string>
+    <string name="upcoming_notifications">Upcoming notifications</string>
+    <string name="at">%1$s at %2$s</string>
+    <string name="take">Take</string>
+    <string name="there_are_no_current_memos">There are no current memos!</string>
+    <string name="med_taken_now">Med taken now</string>
+    <string name="taken_at">Taken at</string>
+    <string name="pass_med">Pass med</string>
+    <string name="memotaken">MemoTaken</string>
 </resources>
