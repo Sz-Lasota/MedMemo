@@ -115,5 +115,10 @@ class NotificationsScheduler(private val context: Context) {
         alarmManager.cancel(pendingIntent)
     }
 
+    fun scheduleNotification(memo: Memo, notification: MemoNotification) {
+        Log.i("MEMO_ADD_NOTIFICATION", "Memo name: ${memo.name}, time: ${notification.date}")
+        scheduleAlarm(memo, notification)
+    }
+
 
 }

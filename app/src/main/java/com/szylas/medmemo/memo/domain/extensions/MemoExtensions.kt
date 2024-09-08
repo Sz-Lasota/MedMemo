@@ -6,7 +6,9 @@ import java.util.Calendar
 
 fun Memo.provideTimes(): List<Int> {
     dosageTime = MutableList(this.numberOfDoses) {
-        it * this.gap + 8 * 60
+        (it * this.gap + 8 * 60) % (24 * 60)
+    }.apply {
+        sort()
     }
     return dosageTime
 }
@@ -19,7 +21,7 @@ fun Memo.updateEndless(): MutableList<MemoNotification> {
     if (finishDate != null) {
         throw RuntimeException("This is not endless memo!")
     }
-    val idBase = (Calendar.getInstance().timeInMillis % 100_000).toInt()
+    val idBase = (Calendar.getInstance().timeInMillis % 100_000).toInt() + (0..100_000).random()
     var idOffset = 0
 
     val stopDate = Calendar.getInstance().apply {

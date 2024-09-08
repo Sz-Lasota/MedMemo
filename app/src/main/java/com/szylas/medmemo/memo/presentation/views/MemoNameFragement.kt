@@ -1,5 +1,6 @@
 package com.szylas.medmemo.memo.presentation.views
 
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,13 +20,14 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import com.szylas.medmemo.R
 import com.szylas.medmemo.common.domain.models.Memo
-import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.components.TextInput
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
@@ -32,10 +35,10 @@ import com.szylas.medmemo.memo.presentation.components.StatusBarManager
 
 @Composable
 fun MemoNameFragment(
-    @Suppress("UNUSED_PARAMETER") activity: ComponentActivity,
+    activity: ComponentActivity,
     statusBarManager: StatusBarManager,
     memo: Memo,
-    navigation: () -> Unit
+    navigation: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -47,30 +50,31 @@ fun MemoNameFragment(
             mutableStateOf(memo.name)
         }
         var numberOfDoses by remember {
-            mutableIntStateOf(memo.numberOfDoses)
+            mutableStateOf("")
         }
 
         var gapHour by remember {
-            mutableIntStateOf(memo.gap / 60)
+            mutableStateOf("")
         }
         var gapMinute by remember {
-            mutableIntStateOf(memo.gap % 60)
+            mutableStateOf("")
         }
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(R.string.medicament_information),
-                style = TextStyleProvider.provide(style = TextStyleOption.TITLE_LARGE),
+                style = MaterialTheme.typography.headlineMedium,
                 softWrap = true
             )
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.outline
             )
         }
+
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.medicament_name),
-            style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM),
+            style = MaterialTheme.typography.titleLarge,
             softWrap = true
         )
         TextInput(modifier = Modifier.fillMaxWidth(),
@@ -83,41 +87,60 @@ fun MemoNameFragment(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.number_of_doses),
-            style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM)
-        )
+            style = MaterialTheme.typography.titleLarge,
+
+            )
         TextInput(modifier = Modifier.fillMaxWidth(),
-            value = "$numberOfDoses",
+            value = numberOfDoses,
             label = stringResource(id = R.string.number_of_doses),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             onValueChange = {
-                numberOfDoses = it.toIntOrNull() ?: 0
+                if (!it.isDigitsOnly()) {
+                    return@TextInput
+                }
+                numberOfDoses = it
                 memo.numberOfDoses = it.toIntOrNull() ?: 0
             })
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.gap_between_doses),
-            style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM)
-        )
+            style = MaterialTheme.typography.titleLarge,
+
+            )
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)
         ) {
             TextInput(
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                value = "$gapHour",
+                value = gapHour,
                 label = stringResource(R.string.hours),
                 onValueChange = {
-                    gapHour = it.toIntOrNull() ?: gapHour
-                    memo.gap = (it.toIntOrNull() ?: 0) * 60 + gapMinute
+                    if ((it.toIntOrNull() ?: 0) >= 24) {
+                        return@TextInput
+                    }
+                    if (!it.isDigitsOnly()) {
+                        return@TextInput
+                    }
+                    gapHour = it
+                    memo.gap = (it.toIntOrNull() ?: 0) * 60 + (gapMinute.toIntOrNull() ?: 0)
                 },
                 modifier = Modifier.weight(1f)
             )
             TextInput(
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                value = "$gapMinute",
+                value = gapMinute,
                 label = stringResource(R.string.minutes),
                 onValueChange = {
-                    gapMinute = it.toIntOrNull() ?: gapMinute
-                    memo.gap = (it.toIntOrNull() ?: 0) + gapHour * 60
+                    if ((it.toIntOrNull() ?: 0) >= 60) {
+                        return@TextInput
+                    }
+                    if (!it.isDigitsOnly()) {
+                        return@TextInput
+                    }
+                    gapMinute = it
+                    memo.gap = (it.toIntOrNull() ?: 0) + (gapHour.toIntOrNull() ?: 0) * 60
                 },
                 modifier = Modifier.weight(1f)
             )
@@ -128,10 +151,21 @@ fun MemoNameFragment(
         Spacer(modifier = Modifier.weight(1f))
         statusBarManager.StatusBar()
         Spacer(modifier = Modifier.weight(0.2f))
-        SecondaryButton(
-            text = stringResource(R.string.next),
-            onClick = navigation,
+        Button(
+            onClick = {
+                if (memo.gap * (memo.numberOfDoses - 1) > 23 * 60 + 59) {
+                    Toast.makeText(
+                        activity,
+                        activity.getString(R.string.cannot_schedule),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@Button
+                }
+                navigation()
+            },
             modifier = Modifier.fillMaxWidth()
-        )
+        ) {
+            Text(text = stringResource(id = R.string.next))
+        }
     }
 }

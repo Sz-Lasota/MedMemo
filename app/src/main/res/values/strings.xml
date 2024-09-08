@@ -1,25 +1,17 @@
 <resources>
     <string name="app_name">MedMemo</string>
     <string name="title_activity_main">LoginActivity</string>
-    <string name="welcome">Welcome</string>
-    <string name="please_sign_in_to_continue">Please sign in, to continue</string>
     <string name="e_mail">E-mail</string>
-    <string name="login">Login</string>
     <string name="sing_up">Sing up</string>
     <string name="password">Password</string>
-    <string name="don_t_have_account">Don\'t have account?</string>
     <string name="registeractivity">RegisterActivity</string>
     <string name="name">Name</string>
     <string name="repeatPassword">Repeat password</string>
     <string name="mainactivity">MainActivity</string>
-    <string name="statistics">Statistics</string>
     <string name="newmemoactivity">NewMemoActivity</string>
     <string name="next">Next</string>
     <string name="medicament_information">Medicament information</string>
     <string name="medicament_name">Medicament name</string>
-    <string name="this_name_will_be_used_to_display_notifications_and_events_in_calendar">This name will be used to display notifications and events in calendar</string>
-    <string name="dosage_information">Dosage information</string>
-    <string name="read_my_cmi">Read my CMI</string>
     <string name="time_information">Time information</string>
     <string name="reminder_mode">Reminder mode</string>
     <string name="strict_mode">Strict mode</string>
@@ -43,7 +35,6 @@
     <string name="remember_to_take_your_med">Remember to take your med</string>
     <string name="profile">Profile</string>
     <string name="new_memo">New memo</string>
-    <string name="manage_memos">Manage memos</string>
     <string name="managememoactivity">ManageMemoActivity</string>
     <string name="see_more">See more</string>
     <string name="current_memos">Current memos</string>
@@ -58,4 +49,19 @@
     <string name="taken_at">Taken at</string>
     <string name="pass_med">Pass med</string>
     <string name="memotaken">MemoTaken</string>
+    <string name="there_are_no_notifications_scheduled">There are no notifications scheduled.</string>
+    <string name="prolong">Prolong</string>
+    <string name="fold">Fold</string>
+    <string name="login">Login</string>
+    <string name="don_t_have_account">Don\'t have account?</string>
+    <string name="please_sign_in_to_continue">Please sign in to continue</string>
+    <string name="welcome">Welcome</string>
+    <string name="cannot_schedule">Cannot create schedule for provided gap and dosage number. Make sure it can be fitted into 24 hour.</string>
+    <string name="already_exists">This hour of dosage already exists</string>
+    <string name="before_today">Selected date is before today, choose correct date!</string>
+    <string name="before_start">Selected date is before starting date, choose another one!</string>
+    <string name="dates">Dates</string>
+    <string name="dosage">Dosage</string>
+    <string name="mode">Mode</string>
+    <string name="finish">Finish</string>
 </resources>

@@ -10,13 +10,16 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -52,13 +55,14 @@ import com.szylas.medmemo.main.presentation.views.HomeFragment
 import com.szylas.medmemo.main.presentation.views.ProfileFragment
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
 import com.szylas.medmemo.memo.domain.notifications.MemoNotificationReceiver
+import com.szylas.medmemo.memo.domain.notifications.NotificationsScheduler
 import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
 import com.szylas.medmemo.memo.presentation.NewMemoActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-
+    private val notificationsScheduler = NotificationsScheduler(this)
 
     private val bottomNavItems = listOf(
         NavBarItem(
@@ -138,14 +142,16 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     floatingActionButton = {
-                        ExtendedFloatingActionButton(onClick = {
-                            startActivity(
-                                Intent(
-                                    this,
-                                    NewMemoActivity::class.java
+                        ExtendedFloatingActionButton(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this,
+                                        NewMemoActivity::class.java
+                                    )
                                 )
-                            )
-                        }) {
+                            }) {
                             Text(text = stringResource(id = R.string.new_memo))
                         }
                     }
@@ -194,28 +200,11 @@ class MainActivity : ComponentActivity() {
     private fun scheduleNotifications(notifications: Map<Memo, List<MemoNotification>>) {
         notifications.forEach { (memo, notificationList) ->
             notificationList.forEach {
-                val intent =
-                    Intent(applicationContext, MemoNotificationReceiver::class.java).apply {
-                        putExtra("NOTIFICATION", it)
-                        putExtra("MEMO", memo)
-                    }
-
-                val pendingIntent = PendingIntent.getBroadcast(
-                    applicationContext,
-                    it.notificationId,
-                    intent,
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                )
-
-                val alarm = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                notificationsScheduler.scheduleNotification(memo, it)
 
                 Log.d(
                     "SCHEDULE",
                     "Notification (id: ${it.notificationId}, name: ${it.name}) scheduled at: ${it.date.timeInMillis}"
-                )
-
-                alarm.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP, it.date.timeInMillis, pendingIntent
                 )
             }
         }

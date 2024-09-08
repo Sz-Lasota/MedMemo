@@ -1,11 +1,8 @@
 package com.szylas.medmemo.main.presentation.views
 
 import android.content.Intent
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,9 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -39,7 +34,6 @@ import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.main.domain.getUpcomingNotifications
 import com.szylas.medmemo.memo.presentation.ManageMemoActivity
 import com.szylas.medmemo.memo.presentation.MemoTakenActivity
-import java.util.Calendar
 
 
 @Composable

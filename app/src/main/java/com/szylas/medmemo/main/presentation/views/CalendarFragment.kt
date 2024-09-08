@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.unit.dp
 import com.szylas.medmemo.calendar.presentation.DayCarousel
 import com.szylas.medmemo.calendar.presentation.DaySchedule
@@ -64,11 +66,14 @@ fun CalendarFragment(memos: List<Memo>?, activity: ComponentActivity) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
+            .padding(10.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top)
     ) {
-        DayCarousel(activity) {
-            lookupDay = it
+        DayCarousel(activity) { calendar ->
+            lookupDay = calendar
             notifications = memos
                 .flatMap { it.notifications }
                 .filter {
@@ -77,12 +82,11 @@ fun CalendarFragment(memos: List<Memo>?, activity: ComponentActivity) {
                 }
         }
 
+        HorizontalDivider(modifier = Modifier.fillMaxWidth())
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .shadow(5.dp, RoundedCornerShape(14.dp))
                 .clip(RoundedCornerShape(14.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer)
                 .padding(10.dp),
         ) {
             DaySchedule(

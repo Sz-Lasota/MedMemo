@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +28,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.szylas.medmemo.R
 import com.szylas.medmemo.calendar.domain.generateDates
 import com.szylas.medmemo.common.domain.formatters.formatTime
 import com.szylas.medmemo.common.domain.models.MemoNotification
@@ -73,7 +76,7 @@ fun DaySchedule(
         .map { it.date.get(Calendar.HOUR_OF_DAY) * 60 + it.date.get(Calendar.MINUTE) }
         .groupBy { it }
         .map { it.value.size }
-        .max()
+        .maxOrNull()
 
     val gridCells = scheduledEvents
             .groupBy { it.date.get(Calendar.HOUR_OF_DAY) * 60 + it.date.get(Calendar.MINUTE) }
@@ -81,6 +84,17 @@ fun DaySchedule(
             .sortedBy { it.second.first().date }
 
     val cellHeight = 70.dp
+
+    if (columnsCount == null) {
+        Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = stringResource(R.string.there_are_no_notifications_scheduled))
+        }
+        return
+    }
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(columnsCount),
@@ -138,23 +152,19 @@ fun NotificationEvent(notification: MemoNotification, modifier: Modifier = Modif
     Column(
         modifier = modifier
     ) {
-        Text(text = notification.name, style = MaterialTheme.typography.titleMedium, maxLines = 1)
-        Text(text = formatTime(notification.date), maxLines = 1)
+        Text(text = notification.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, color = MaterialTheme.colorScheme.onPrimary)
+        Text(text = formatTime(notification.date), maxLines = 1, color = MaterialTheme.colorScheme.onPrimary)
 
     }
 }
 
 @Composable
 fun DateTile(day: String, month: String, active: Boolean, onClick: () -> Unit) {
-    ElevatedButton(
+    Button(
         onClick = onClick,
         modifier = Modifier
             .width(80.dp)
             .height(70.dp),
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 5.dp,
-            disabledElevation = 5.dp
-        ),
         shape = RoundedCornerShape(20.dp),
         enabled = !active,
         colors = ButtonDefaults.buttonColors().copy(
@@ -175,4 +185,4 @@ fun DateTile(day: String, month: String, active: Boolean, onClick: () -> Unit) {
             )
         }
     }
-}
+} 

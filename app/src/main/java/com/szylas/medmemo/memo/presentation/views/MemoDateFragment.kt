@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -44,7 +46,7 @@ fun MemoDateFragment(
     activity: ComponentActivity,
     statusBarManager: StatusBarManager,
     memo: Memo,
-    navigation: () -> Unit
+    navigation: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -74,7 +76,7 @@ fun MemoDateFragment(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(R.string.date_information),
-                style = TextStyleProvider.provide(style = TextStyleOption.TITLE_LARGE),
+                style = MaterialTheme.typography.headlineMedium,
                 softWrap = true
             )
             HorizontalDivider(
@@ -84,20 +86,21 @@ fun MemoDateFragment(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.start_date),
-            style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM),
+            style = MaterialTheme.typography.titleLarge,
             softWrap = true
         )
-        PrimaryButton(
-            text = stringResource(R.string.choose),
+        Button(
             onClick = { startShowDatePicker = true },
             modifier = Modifier.fillMaxWidth()
-        )
+        ) {
+            Text(stringResource(id = R.string.choose))
+        }
 
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = formatFullDate(startDate),
             textAlign = TextAlign.Center,
-            style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+            style = MaterialTheme.typography.titleSmall,
             softWrap = true
         )
 
@@ -105,7 +108,7 @@ fun MemoDateFragment(
             Text(
                 modifier = Modifier,
                 text = stringResource(R.string.finish_date),
-                style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM),
+                style = MaterialTheme.typography.titleSmall,
                 softWrap = true
             )
             Spacer(modifier = Modifier.weight(1f))
@@ -118,18 +121,20 @@ fun MemoDateFragment(
             })
         }
 
-        PrimaryButton(
-            text = stringResource(R.string.choose),
+        Button(
             onClick = { finishShowDatePicker = true },
             modifier = Modifier.fillMaxWidth(),
             enabled = !endless
-        )
+        ) {
+            Text(stringResource(id = R.string.choose))
+        }
+
 
         Text(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
-            text = finishDate?.let { formatFullDate(it) } ?: "Endless",
-            style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL),
+            text = finishDate?.let { formatFullDate(it) } ?: activity.getString(R.string.endless),
+            style = MaterialTheme.typography.labelLarge,
             softWrap = true,
         )
 
@@ -137,11 +142,12 @@ fun MemoDateFragment(
         Spacer(modifier = Modifier.weight(1f))
         statusBarManager.StatusBar()
         Spacer(modifier = Modifier.weight(0.2f))
-        SecondaryButton(
-            text = stringResource(id = R.string.next),
+        Button(
             onClick = navigation,
             modifier = Modifier.fillMaxWidth()
-        )
+        ) {
+            Text(stringResource(id = R.string.next))
+        }
 
         if (startShowDatePicker) {
             DatePickerDialog(onDismissRequest = { startShowDatePicker = false }, confirmButton = {
@@ -159,7 +165,7 @@ fun MemoDateFragment(
                     } else {
                         Toast.makeText(
                             activity,
-                            "Selected date is before today, choose correct date!",
+                            activity.getString(R.string.before_today),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -191,7 +197,7 @@ fun MemoDateFragment(
                     } else {
                         Toast.makeText(
                             activity,
-                            "Selected date is before today or before starting date, choose correct date!",
+                            activity.getString(R.string.before_start),
                             Toast.LENGTH_SHORT
                         ).show()
                     }

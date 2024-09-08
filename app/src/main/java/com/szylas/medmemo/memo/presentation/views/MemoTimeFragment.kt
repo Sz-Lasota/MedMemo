@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -51,7 +52,7 @@ fun MemoTimeFragment(
     activity: ComponentActivity,
     statusBarManager: StatusBarManager,
     memo: Memo,
-    navigation: () -> Unit
+    navigation: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -73,7 +74,7 @@ fun MemoTimeFragment(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(R.string.time_information),
-                style = TextStyleProvider.provide(style = TextStyleOption.TITLE_LARGE),
+                style = MaterialTheme.typography.headlineMedium,
                 softWrap = true
             )
             HorizontalDivider(
@@ -83,7 +84,7 @@ fun MemoTimeFragment(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.reminder_mode),
-            style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM),
+            style = MaterialTheme.typography.titleLarge,
             softWrap = true
         )
         Row(
@@ -104,14 +105,12 @@ fun MemoTimeFragment(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.hours_of_dosing),
-            style = TextStyleProvider.provide(style = TextStyleOption.LABEL_MEDIUM),
+            style = MaterialTheme.typography.titleLarge,
             softWrap = true
         )
-        PrimaryButton(
-            text = stringResource(R.string.add),
-            onClick = { showTimePicker = true },
-            modifier = Modifier.fillMaxWidth()
-        )
+        Button(onClick = { showTimePicker = true }, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(id = R.string.add))
+        }
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -125,7 +124,7 @@ fun MemoTimeFragment(
                     onEdit = { newHour ->
                         if (hours.contains(newHour)) {
                             Toast.makeText(
-                                activity, "This hour of dosage already exists", Toast.LENGTH_SHORT
+                                activity, activity.getString(R.string.already_exists), Toast.LENGTH_SHORT
                             ).show()
                             return@ListItem
                         }
@@ -159,11 +158,12 @@ fun MemoTimeFragment(
         Spacer(modifier = Modifier.weight(1f))
         statusBarManager.StatusBar()
         Spacer(modifier = Modifier.weight(0.2f))
-        SecondaryButton(
-            text = stringResource(id = R.string.next),
+        Button(
             onClick = navigation,
             modifier = Modifier.fillMaxWidth()
-        )
+        ) {
+            Text(stringResource(id = R.string.next))
+        }
 
         if (showTimePicker) {
             TimePickerDialog(
@@ -172,7 +172,8 @@ fun MemoTimeFragment(
                     TextButton(onClick = {
                         if (hours.contains(timePickerState.hour * 60 + timePickerState.minute)) {
                             Toast.makeText(
-                                activity, "This hour of dosage already exists", Toast.LENGTH_SHORT
+                                activity,
+                                activity.getString(R.string.already_exists), Toast.LENGTH_SHORT
                             ).show()
                             showTimePicker = false
                             return@TextButton
@@ -207,7 +208,7 @@ fun MemoTimeFragment(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListItem(
-    title: String, onEdit: (Int) -> Unit, onRemove: () -> Unit, modifier: Modifier = Modifier
+    title: String, onEdit: (Int) -> Unit, onRemove: () -> Unit, modifier: Modifier = Modifier,
 ) {
     var showTimePicker by remember {
         mutableStateOf(false)
@@ -222,15 +223,18 @@ fun ListItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Text(text = title, style = TextStyleProvider.provide(style = TextStyleOption.LABEL_SMALL))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium
+        )
         Spacer(modifier = Modifier.weight(1f))
-        SecondaryButton(
-            text = stringResource(R.string.edit), onClick = { showTimePicker = true }
-        )
-        PrimaryButton(
-            text = stringResource(R.string.remove), onClick = onRemove
-        )
-
+        Button(onClick = { showTimePicker = true }) {
+            Text(stringResource(id = R.string.edit))
+        }
+        Spacer(modifier = Modifier.weight(0.1f))
+        Button(onClick = onRemove) {
+            Text(stringResource(id = R.string.remove))
+        }
 
         if (showTimePicker) {
             TimePickerDialog(

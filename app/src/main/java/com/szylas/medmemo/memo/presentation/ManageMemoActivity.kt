@@ -1,11 +1,9 @@
 package com.szylas.medmemo.memo.presentation
 
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -17,16 +15,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -36,7 +36,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,8 +54,6 @@ import com.szylas.medmemo.R
 import com.szylas.medmemo.common.domain.formatters.formatFullDate
 import com.szylas.medmemo.common.domain.formatters.formatTime
 import com.szylas.medmemo.common.domain.models.Memo
-import com.szylas.medmemo.common.presentation.components.ErrorButton
-import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
@@ -64,7 +61,6 @@ import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
 import com.szylas.medmemo.memo.domain.notifications.NotificationsScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 // TODO:Fix this issues:
 //  1. Prolong memos and schedule new reminders!
@@ -173,31 +169,35 @@ class ManageMemoActivity : ComponentActivity() {
                                     if (currentExpanded != null && index == currentExpanded) {
                                         ExpandedMemoItem(
                                             memo = item,
+                                            onFold = { currentExpanded = null },
                                             onProlongClick = { Log.d("Prolong", it.name) },
                                             onDeleteClick = { memo ->
-                                                lifecycleScope.remove(memo, onSuccess = {
-                                                    memos = mutableListOf<Memo>().also { list ->
-                                                        list.addAll(memos)
-                                                        list.remove(memo)
-                                                    }.toList()
-                                                    Toast.makeText(
-                                                        this@ManageMemoActivity,
-                                                        it,
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                }, onError = {
-                                                    Toast.makeText(
-                                                        this@ManageMemoActivity,
-                                                        it,
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                }, onSessionNotFound = {
-                                                    Toast.makeText(
-                                                        this@ManageMemoActivity,
-                                                        "Session not found, log in and try again!",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                })
+                                                lifecycleScope.remove(
+                                                    memo = memo,
+                                                    onSuccess = {
+                                                        memos = mutableListOf<Memo>().also { list ->
+                                                            list.addAll(memos)
+                                                            list.remove(memo)
+                                                        }.toList()
+                                                        Toast.makeText(
+                                                            this@ManageMemoActivity,
+                                                            it,
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                        currentExpanded = null
+                                                    }, onError = {
+                                                        Toast.makeText(
+                                                            this@ManageMemoActivity,
+                                                            it,
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }, onSessionNotFound = {
+                                                        Toast.makeText(
+                                                            this@ManageMemoActivity,
+                                                            "Session not found, log in and try again!",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    })
                                             }
                                         )
                                     } else {
@@ -220,9 +220,10 @@ class ManageMemoActivity : ComponentActivity() {
     @Composable
     fun ExpandedMemoItem(
         memo: Memo,
+        onFold: () -> Unit,
         onProlongClick: (Memo) -> Unit,
         onDeleteClick: (Memo) -> Unit,
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
     ) {
         Column(
             modifier = modifier
@@ -232,10 +233,29 @@ class ManageMemoActivity : ComponentActivity() {
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(
-                text = memo.name,
-                style = MaterialTheme.typography.titleMedium,
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = memo.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 36.sp
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = onFold) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowUp,
+                        contentDescription = stringResource(
+                            R.string.fold
+                        ),
+                        modifier = Modifier
+                            .width(24.dp)
+                            .height(24.dp)
+                    )
+                }
+            }
             HorizontalDivider(modifier = Modifier.fillMaxWidth())
             Row(
                 modifier = Modifier
@@ -267,7 +287,7 @@ class ManageMemoActivity : ComponentActivity() {
                     style = MaterialTheme.typography.labelLarge,
                 )
                 Text(
-                    text = memo.dosageTime.map { formatTime(it) }.joinToString(separator = ", ")
+                    text = memo.dosageTime.joinToString(separator = ", ") { formatTime(it) }
                 )
             }
             Column(
@@ -298,16 +318,25 @@ class ManageMemoActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                ErrorButton(
-                    text = stringResource(id = R.string.remove),
+                Button(
                     onClick = { onDeleteClick(memo) },
-                    modifier.weight(1f)
-                )
-                SecondaryButton(
-                    text = "Prolong",
-                    onClick = { onProlongClick(memo) },
-                    modifier.weight(1f)
-                )
+                    colors = ButtonDefaults.buttonColors().copy(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ),
+                    modifier = modifier.weight(1f)
+                ) {
+                    Text(text = stringResource(id = R.string.remove))
+                }
+
+                if (memo.finishDate != null) {
+                    Button(
+                        onClick = { onProlongClick(memo) },
+                        modifier = modifier.weight(1f)
+                    ) {
+                        Text(text = stringResource(R.string.prolong))
+                    }
+                }
             }
 
         }
@@ -351,7 +380,7 @@ class ManageMemoActivity : ComponentActivity() {
         memo: Memo,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit,
-        onSessionNotFound: () -> Unit
+        onSessionNotFound: () -> Unit,
     ) = launch {
         memoManager.deleteMemo(memo, onSuccess, onError, onSessionNotFound)
         notificationsScheduler.cancelNotifications(memo)
@@ -360,7 +389,7 @@ class ManageMemoActivity : ComponentActivity() {
     private fun CoroutineScope.loadActive(
         onSuccess: (List<Memo>) -> Unit,
         onError: (String) -> Unit,
-        onSessionNotFound: () -> Unit
+        onSessionNotFound: () -> Unit,
     ) = launch {
         memoManager.loadActive(onSuccess, onError, onSessionNotFound)
     }
