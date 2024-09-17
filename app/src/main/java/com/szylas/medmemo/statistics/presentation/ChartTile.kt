@@ -1,37 +1,48 @@
 package com.szylas.medmemo.statistics.presentation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
-import com.szylas.medmemo.common.presentation.style.TextStyleOption
-import com.szylas.medmemo.common.presentation.style.TextStyleProvider
+import ir.ehsannarmani.compose_charts.LineChart
+import ir.ehsannarmani.compose_charts.models.AnimationMode
+import ir.ehsannarmani.compose_charts.models.DotProperties
+import ir.ehsannarmani.compose_charts.models.DrawStyle
+import ir.ehsannarmani.compose_charts.models.LabelProperties
+import ir.ehsannarmani.compose_charts.models.Line
+
 
 @Composable
-fun ChartTile(chart: @Composable () -> Unit, title: String, modifier: Modifier = Modifier) {
+fun LineChartTile(data: List<List<Double>>, labels: List<String>, title: String, modifier: Modifier = Modifier) {
+    val dataList = data
+        .map {
+            Line(
+                label = "",
+                values = it,
+                color = SolidColor(Color.Red),
+                dotProperties = DotProperties(
+                    enabled = true,
+                    color = SolidColor(Color.Red)
+                ),
+                strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
+                gradientAnimationDelay = 1000,
+                drawStyle = DrawStyle.Stroke(width = 2.dp),
+            )
+        }
 
-    Column(
-        modifier = modifier
-            .padding(15.dp)
-            .clip(RoundedCornerShape(24.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = title, style = TextStyleProvider.provide(style = TextStyleOption.LABEL_LARGE))
-        HorizontalDivider(
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.onTertiary
-        )
-        chart()
-    }
-
+    LineChart(
+        modifier = modifier,
+        labelProperties = LabelProperties(
+            enabled = true,
+            labels = labels
+        ),
+        data = dataList,
+        animationMode = AnimationMode.Together(delayBuilder = {
+            it * 500L
+        }),
+        minValue = data.flatten().minOrNull() ?: 0.0
+    )
 }

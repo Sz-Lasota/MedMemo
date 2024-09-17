@@ -1,11 +1,13 @@
 package com.szylas.medmemo.memo.datastore
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import com.szylas.medmemo.common.domain.models.Memo
-import com.szylas.medmemo.memo.datastore.mappers.fromMemo
-import com.szylas.medmemo.memo.datastore.mappers.toMemo
-import com.szylas.medmemo.memo.datastore.models.MemoEntity
+import com.szylas.medmemo.common.datastore.mappers.fromMemo
+import com.szylas.medmemo.common.datastore.mappers.toMemo
+import com.szylas.medmemo.common.datastore.models.MemoEntity
+import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.memo.domain.extensions.id
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
@@ -18,14 +20,15 @@ class FirebaseMemoRepository : IMemoRepository {
         memo: Memo,
         user: String,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     ) {
         firebase.collection(user)
             .document(memo.id())
             .set(fromMemo(memo))
             .addOnSuccessListener {
                 onSuccess("Successfully created memo: ${memo.name}!")
-            }.addOnFailureListener {
+            }
+            .addOnFailureListener {
                 onError(it.message ?: "Unknown error when persisting memo")
             }
     }
@@ -34,14 +37,15 @@ class FirebaseMemoRepository : IMemoRepository {
         memo: Memo,
         user: String,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     ) {
         firebase.collection(user)
             .document(memo.id())
             .delete()
             .addOnSuccessListener {
                 onSuccess("Successfully deleted: ${memo.name}")
-            }.addOnFailureListener {
+            }
+            .addOnFailureListener {
                 onError(it.message ?: "Unknown error when updating memo")
             }
     }
@@ -50,14 +54,50 @@ class FirebaseMemoRepository : IMemoRepository {
         memo: Memo,
         user: String,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     ) {
         firebase.collection(user)
             .document(memo.id())
             .set(fromMemo(memo))
             .addOnSuccessListener {
                 onSuccess("Successfully updated memo: ${memo.name}!")
-            }.addOnFailureListener {
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Unknown error when updating memo")
+            }
+    }
+
+    override suspend fun updateNotification(
+        memo: Memo,
+        notification: MemoNotification,
+        user: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        firebase.collection(user)
+            .document(memo.id())
+            .get()
+            .addOnSuccessListener {
+                val entity = it.toObject(MemoEntity::class.java)
+
+                if (entity == null) {
+                    onError("Unknown error")
+                    return@addOnSuccessListener
+                }
+                val obj = toMemo(entity)
+                val index = obj.notifications.indexOf(obj.notifications.firstOrNull { notif -> notif.notificationId == notification.notificationId })
+                obj.notifications[index].intakeTime = notification.intakeTime
+                Log.d("Updating", obj.notifications[index].toString())
+                firebase.collection(user).document(memo.id()).set(fromMemo(obj))
+                    .addOnSuccessListener {
+                        onSuccess("Successfully updated memo: ${memo.name}!")
+                    }
+                    .addOnFailureListener {exc ->
+                        onError(exc.message ?: "Unknown error when updating memo")
+                    }
+
+            }
+            .addOnFailureListener {
                 onError(it.message ?: "Unknown error when updating memo")
             }
     }
@@ -65,7 +105,7 @@ class FirebaseMemoRepository : IMemoRepository {
     override suspend fun loadActive(
         user: String,
         onSuccess: (List<Memo>) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     ) {
         val today = Calendar.getInstance()
         firebase.collection(user)

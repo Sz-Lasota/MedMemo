@@ -18,6 +18,7 @@ fun Memo.id(): String {
 }
 
 fun Memo.updateEndless(): MutableList<MemoNotification> {
+    // TODO: Fix it, if it is broken
     if (finishDate != null) {
         throw RuntimeException("This is not endless memo!")
     }
@@ -32,7 +33,8 @@ fun Memo.updateEndless(): MutableList<MemoNotification> {
     val newNotifications: MutableList<MemoNotification> = mutableListOf()
 
     notificationsMap.forEach { (hour, memoNotifications) ->
-        val newestNotificationDate = Calendar.getInstance().apply { timeInMillis = memoNotifications.maxOf { it.date }.timeInMillis }
+        val newestNotificationDate = Calendar.getInstance()
+            .apply { timeInMillis = memoNotifications.maxOf { it.date }.timeInMillis }
 
         newestNotificationDate.set(Calendar.HOUR_OF_DAY, hour / 60)
         newestNotificationDate.set(Calendar.MINUTE, hour % 60)
@@ -42,7 +44,8 @@ fun Memo.updateEndless(): MutableList<MemoNotification> {
             val notify = MemoNotification(
                 name = name,
                 baseDosageTime = hour,
-                date = Calendar.getInstance().apply { timeInMillis = newestNotificationDate.timeInMillis },
+                date = Calendar.getInstance()
+                    .apply { timeInMillis = newestNotificationDate.timeInMillis },
                 notificationId = idBase + idOffset
             )
             idOffset++
@@ -68,19 +71,19 @@ fun Memo.generateNotifications() {
         val now = Calendar.getInstance()
         if (finishDate != null) {
             while (!date.after(finishDate)) {
-                val notifiyDate = Calendar.getInstance().apply {
+                val notifyDate = Calendar.getInstance().apply {
                     timeInMillis = date.timeInMillis
                     set(Calendar.HOUR_OF_DAY, hour / 60)
                     set(Calendar.MINUTE, hour % 60)
                 }
-                if (notifiyDate.before(now)) {
+                if (notifyDate.before(now)) {
                     date.add(Calendar.DATE, 1)
                     idOffset++
                     continue
                 }
                 notifications.add(
                     MemoNotification(
-                        date = notifiyDate,
+                        date = notifyDate,
                         baseDosageTime = hour,
                         name = name,
                         notificationId = idBase + idOffset
@@ -89,27 +92,34 @@ fun Memo.generateNotifications() {
                 date.add(Calendar.DATE, 1)
                 idOffset++
             }
-            notifications.add(MemoNotification(date = Calendar.getInstance().apply {
-                timeInMillis = date.timeInMillis
-                set(Calendar.HOUR_OF_DAY, hour / 60)
-                set(Calendar.MINUTE, hour % 60)
-            }, name = name, notificationId = idBase + idOffset))
+            notifications.add(
+                MemoNotification(
+                    date = Calendar.getInstance().apply {
+                        timeInMillis = date.timeInMillis
+                        set(Calendar.HOUR_OF_DAY, hour / 60)
+                        set(Calendar.MINUTE, hour % 60)
+                    },
+                    baseDosageTime = hour,
+                    name = name,
+                    notificationId = idBase + idOffset
+                )
+            )
             idOffset++
         } else {
-            for (i in 1..7) {
-                val notifiyDate = Calendar.getInstance().apply {
+            for (i in 1..91) {
+                val notifyDate = Calendar.getInstance().apply {
                     timeInMillis = date.timeInMillis
                     set(Calendar.HOUR_OF_DAY, hour / 60)
                     set(Calendar.MINUTE, hour % 60)
                 }
-                if (notifiyDate.before(now)) {
+                if (notifyDate.before(now)) {
                     date.add(Calendar.DATE, 1)
                     idOffset++
                     continue
                 }
                 notifications.add(
                     MemoNotification(
-                        date = notifiyDate,
+                        date = notifyDate,
                         baseDosageTime = hour,
                         name = name,
                         notificationId = idBase + idOffset

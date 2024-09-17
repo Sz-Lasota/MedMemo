@@ -9,7 +9,11 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import com.szylas.medmemo.R
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -256,7 +260,7 @@ fun MedMemoTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
   val colorScheme = when {
       dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -274,4 +278,9 @@ fun MedMemoTheme(
     content = content
   )
 }
+
+@Composable
+fun imageBackground(
+    darkTheme: Boolean = isSystemInDarkTheme()
+) : Painter = if (darkTheme) painterResource(id = R.drawable.bg_dark) else painterResource(id = R.drawable.bg_bright)
 

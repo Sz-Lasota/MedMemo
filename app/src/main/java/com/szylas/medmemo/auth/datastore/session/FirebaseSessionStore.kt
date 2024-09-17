@@ -8,4 +8,8 @@ class FirebaseSessionStore: ISessionStore {
     override fun getUsername(): String? {
         return firebase.currentUser?.uid
     }
+
+    override fun signOut() {
+        firebase.signOut()
+    }
 }

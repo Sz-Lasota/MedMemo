@@ -5,6 +5,7 @@ accompanistSystemuicontroller = "0.27.0"
 activityComposeVersion = "1.9.1"
 #noinspection AndroidGradlePluginVersion
 agp = "8.5.1"
+chart = "0.0.5-beta"
 firebaseAnalytics = "22.0.2"
 firebaseBom = "33.2.0"
 kotlin = "1.9.0"
@@ -37,6 +38,7 @@ accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-
 androidx-activity-compose-v172 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+chart = { module = "io.github.thechance101:chart", version.ref = "chart" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 google-firebase-analytics = { module = "com.google.firebase:firebase-analytics", version.ref = "firebaseAnalytics" }

@@ -46,12 +46,7 @@ class NotificationsScheduler(private val context: Context) {
             .filter { it.notificationId != lastNotification.notificationId }
             .minBy { it.date }
 
-        Log.d(
-            "Pending notification",
-            "Pending notification (id: ${pendingNotification.notificationId}) at: ${pendingNotification.date.timeInMillis}, Last notification ,\n" +
-                    "\"Pending notification (id: ${pendingNotification.notificationId}) at: ${pendingNotification.date.timeInMillis}."
-        )
-
+        Log.e("Rescheduling", "Notification to reschedule: $pendingNotification")
         cancelAlarm(memo, pendingNotification)
         val previousData = memo.notifications
             .filter { it.baseDosageTime == lastNotification.baseDosageTime }
@@ -66,6 +61,7 @@ class NotificationsScheduler(private val context: Context) {
         scheduleAlarm(memo, pendingNotification)
         memoManager.updateMemo(
             memo,
+            lastNotification,
             onSuccess,
             onError,
             onSessionNotFound

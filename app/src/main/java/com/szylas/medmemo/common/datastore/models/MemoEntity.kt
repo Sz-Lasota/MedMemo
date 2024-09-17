@@ -1,4 +1,4 @@
-package com.szylas.medmemo.memo.datastore.models
+package com.szylas.medmemo.common.datastore.models
 
 import java.io.Serializable
 import java.util.Calendar

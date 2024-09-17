@@ -14,7 +14,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -25,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,8 +43,6 @@ import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.common.presentation.components.PrimaryButton
 import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.components.TimePickerDialog
-import com.szylas.medmemo.common.presentation.style.TextStyleOption
-import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.memo.domain.extensions.getMemo
 import com.szylas.medmemo.memo.domain.extensions.getNotification
@@ -98,91 +98,76 @@ class MemoTakenFromNotificationActivity : ComponentActivity() {
                         val timePickerState = rememberTimePickerState()
                         var showTimePicker by remember { mutableStateOf(false) }
                         Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Text(
-                                text = memo.name,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth(),
-                                style = TextStyleProvider.provide(
-                                    style = TextStyleOption.TITLE_LARGE
-                                )
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                text = stringResource(R.string.when_did_you_take_your, memo.name),
+                                style = MaterialTheme.typography.headlineLarge
                             )
+
                             Spacer(modifier = Modifier.weight(1f))
-                            PrimaryButton(text = "Med taken now", onClick = {
-                                val indexOfNotification =
-                                    memo.notifications.indexOf(memo.notifications.firstOrNull { it.notificationId == notification.notificationId })
-                                memo.notifications[indexOfNotification].intakeTime =
-                                    Calendar.getInstance()
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                onClick = {
+                                    medTakenClick(
+                                        memo,
+                                        notification,
+                                        Calendar.getInstance()
+                                    )
+                                }
+                            ) {
+                                Text(text = stringResource(R.string.now))
+                            }
 
-                                lifecycleScope.rescheduleNotification(
-                                    memo,
-                                    notification,
-                                    WeightedAveragePrediction(),
-                                    onSuccess = {
-                                        finish()
-                                    }, onError = {
-                                        Toast.makeText(
-                                            this@MemoTakenFromNotificationActivity,
-                                            "Unable to save intake time: $it! Check your internet connection or try again later!",
-                                            Toast.LENGTH_SHORT,
-                                        ).show()
-                                    }, onSessionNotFound = {
-                                        Log.e("SESSION", "Session not found")
-                                    }
-                                )
+                            Button(
+                                modifier =  Modifier
+                                    .fillMaxWidth(),
+                                onClick = { showTimePicker = true }
+                            ) {
+                                Text(text = stringResource(R.string.at_))
+                            }
 
-                                Log.d("MED", "Taken now ${notification.date}")
-                            }, modifier = Modifier.fillMaxWidth())
-                            PrimaryButton(
-                                text = "Taken at",
-                                onClick = { showTimePicker = true },
-                                modifier = Modifier.fillMaxWidth()
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                text = stringResource(R.string.not_planning_to_take_your_med)
                             )
-                            SecondaryButton(text = "Pass", onClick = {
-                                finish()
-                            }, modifier = Modifier.fillMaxWidth())
+
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors().copy(
+                                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                                ),
+                                onClick = { finish() }
+                            ) {
+                                Text(text = "Pass")
+                            }
                         }
 
                         if (showTimePicker) {
                             TimePickerDialog(
                                 onDismissRequest = { showTimePicker = false },
                                 confirmButton = {
-                                    TextButton(onClick = {
-                                        val indexOfNotification = memo.notifications
-                                            .indexOf(memo.notifications
-                                                .firstOrNull { it.notificationId == notification.notificationId }
-                                            )
-
-                                        memo.notifications[indexOfNotification].intakeTime =
-                                            Calendar.getInstance().apply {
-                                                set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                                                set(Calendar.MINUTE, timePickerState.minute)
-                                            }
-
-                                        lifecycleScope.rescheduleNotification(
-                                            memo,
-                                            notification,
-                                            WeightedAveragePrediction(),
-                                            onSuccess = {
-                                                finish()
-                                            },
-                                            onError = {
-                                                Toast.makeText(
-                                                    this@MemoTakenFromNotificationActivity,
-                                                    "Unable to save intake time: $it! Check your internet connection or try again later!",
-                                                    Toast.LENGTH_SHORT,
-                                                ).show()
-                                            },
-                                            onSessionNotFound = {
-                                                Log.e("SESSION", "Session not found")
-                                            }
-                                        )
-
-                                        showTimePicker = false
-                                    }) {
+                                    TextButton(
+                                        onClick = {
+                                            medTakenClick(
+                                                memo = memo,
+                                                notification = notification,
+                                                time = Calendar.getInstance().apply {
+                                                    set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                                                    set(Calendar.MINUTE, timePickerState.minute)
+                                                })
+                                            showTimePicker = false
+                                        }) {
                                         Text(
                                             text = stringResource(
                                                 R.string.ok
@@ -210,6 +195,64 @@ class MemoTakenFromNotificationActivity : ComponentActivity() {
         }
     }
 
+    private fun medTakenClick(
+        memo: Memo,
+        notification: MemoNotification,
+        time: Calendar,
+    ) {
+        val indexOfNotification = memo.notifications.indexOf(
+            memo.notifications
+                .firstOrNull { it.notificationId == notification.notificationId }
+        )
+        memo.notifications[indexOfNotification].intakeTime =
+            time
+        notification.intakeTime = time
+        if (memo.smartMode) {
+            lifecycleScope.rescheduleNotification(
+                memo,
+                notification,
+                WeightedAveragePrediction(),
+                onSuccess = {
+                    Toast.makeText(
+                        this@MemoTakenFromNotificationActivity,
+                        "Intake time successfully updated!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    finish()
+                }, onError = {
+                    Toast.makeText(
+                        this@MemoTakenFromNotificationActivity,
+                        "Unable to save intake time: $it! Check your internet connection or try again later!",
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }, onSessionNotFound = {
+                    Log.e("SESSION", "Session not found")
+                }
+            )
+            return
+        }
+        lifecycleScope.updateMemo(
+            memo = memo,
+            notification = notification,
+            onSuccess = {
+                Toast.makeText(
+                    this@MemoTakenFromNotificationActivity,
+                    "Intake time successfully updated!",
+                    Toast.LENGTH_SHORT
+                ).show()
+                finish()
+            }, onError = {
+                Toast.makeText(
+                    this@MemoTakenFromNotificationActivity,
+                    "Unable to save intake time: $it! Check your internet connection or try again later!",
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }, onSessionNotFound = {
+                Log.e("SESSION", "Session not found")
+            }
+        )
+    }
+
     private fun CoroutineScope.rescheduleNotification(
         memo: Memo,
         lastNotification: MemoNotification,
@@ -230,10 +273,11 @@ class MemoTakenFromNotificationActivity : ComponentActivity() {
 
     private fun CoroutineScope.updateMemo(
         memo: Memo,
+        notification: MemoNotification,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit,
         onSessionNotFound: (String) -> Unit,
     ) = launch {
-        memoManager.updateMemo(memo, onSuccess, onError, onSessionNotFound)
+        memoManager.updateMemo(memo, notification, onSuccess, onError, onSessionNotFound)
     }
 }

@@ -273,7 +273,7 @@ class MemoTakenActivity : ComponentActivity() {
                 memo, lastNotification, prediction, onSuccess, onError, onSessionNotFound
             )
         } else {
-            memoManager.updateMemo(memo, onSuccess, onError, onSessionNotFound)
+            memoManager.updateMemo(memo, lastNotification, onSuccess, onError, onSessionNotFound)
         }
     }
 

@@ -210,7 +210,10 @@ fun NotificationItem(
                 putExtra("NOTIFICATION", notification)
             })
         }) {
-            Text(text = stringResource(R.string.take))
+            Text(
+                text = stringResource(R.string.take),
+                maxLines = 1,
+            )
         }
     }
 }

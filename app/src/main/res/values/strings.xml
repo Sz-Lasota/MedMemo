@@ -64,4 +64,12 @@
     <string name="dosage">Dosage</string>
     <string name="mode">Mode</string>
     <string name="finish">Finish</string>
+    <string name="statistics">Statistics</string>
+    <string name="took_out_of">Took %1$s out of %2$s</string>
+    <string name="today_pills">Today pills</string>
+    <string name="when_did_you_take_your">When did you take your %1$s?</string>
+    <string name="now">Now</string>
+    <string name="at_">At ...</string>
+    <string name="not_planning_to_take_your_med">Not planning to take your med?</string>
+    <string name="active_therapies">Active therapies</string>
 </resources>

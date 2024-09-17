@@ -1,9 +1,9 @@
-package com.szylas.medmemo.memo.datastore.mappers
+package com.szylas.medmemo.common.datastore.mappers
 
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.domain.models.MemoNotification
-import com.szylas.medmemo.memo.datastore.models.MemoEntity
-import com.szylas.medmemo.memo.datastore.models.MemoNotificationEntity
+import com.szylas.medmemo.common.datastore.models.MemoEntity
+import com.szylas.medmemo.common.datastore.models.MemoNotificationEntity
 import java.util.Calendar
 
 fun fromMemo(memo: Memo): MemoEntity {

@@ -46,6 +46,7 @@ import com.szylas.medmemo.R
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
+import com.szylas.medmemo.common.presentation.theme.imageBackground
 import com.szylas.medmemo.main.presentation.models.CalendarScreen
 import com.szylas.medmemo.main.presentation.models.HomeScreen
 import com.szylas.medmemo.main.presentation.models.NavBarItem
@@ -160,7 +161,7 @@ class MainActivity : ComponentActivity() {
                     Box(
                         modifier = Modifier
                             .paint(
-                                painterResource(id = R.drawable.bg_bright),
+                                imageBackground(),
                                 contentScale = ContentScale.FillBounds
                             )
                             .padding(innerPadding)

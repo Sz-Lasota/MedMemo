@@ -1,6 +1,7 @@
 package com.szylas.medmemo.memo.datastore
 
 import com.szylas.medmemo.common.domain.models.Memo
+import com.szylas.medmemo.common.domain.models.MemoNotification
 
 interface IMemoRepository {
 
@@ -20,6 +21,14 @@ interface IMemoRepository {
 
     suspend fun updateMemo(
         memo: Memo,
+        user: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    )
+
+    suspend fun updateNotification(
+        memo: Memo,
+        notification: MemoNotification,
         user: String,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit

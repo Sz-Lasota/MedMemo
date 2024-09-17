@@ -9,4 +9,8 @@ object Session {
     fun user(): String? {
         return defaultStore.getUsername()
     }
+
+    fun signOut() {
+        defaultStore.signOut()
+    }
 }

@@ -44,6 +44,7 @@ class MemoManager(
 
     suspend fun updateMemo(
         memo: Memo,
+        notification: MemoNotification,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit,
         onSessionNotFound: (String) -> Unit
@@ -54,7 +55,7 @@ class MemoManager(
             return
         }
 
-        saver.updateMemo(memo = memo, user = user, onSuccess = onSuccess, onError = onError)
+        saver.updateNotification(memo = memo, notification = notification, user = user, onSuccess = onSuccess, onError = onError)
     }
 
     suspend fun loadActive(
