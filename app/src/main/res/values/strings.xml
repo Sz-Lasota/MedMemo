@@ -72,4 +72,9 @@
     <string name="at_">At ...</string>
     <string name="not_planning_to_take_your_med">Not planning to take your med?</string>
     <string name="active_therapies">Active therapies</string>
+    <string name="there_are_no_active_therapies">There are no active therapies!</string>
+    <string name="not_enough_data">Not enough data</string>
+    <string name="adherence">Adherence</string>
+    <string name="missed">Missed</string>
+    <string name="taken">Taken</string>
 </resources>

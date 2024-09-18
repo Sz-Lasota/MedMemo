@@ -1,9 +1,10 @@
 package com.szylas.medmemo.statistics.domain
 
 import android.util.Log
-import android.widget.Toast
 import com.szylas.medmemo.auth.domain.Session
 import com.szylas.medmemo.common.domain.formatters.formatDate
+import com.szylas.medmemo.common.domain.formatters.formatFullDate
+import com.szylas.medmemo.common.domain.formatters.formatTime
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.statistics.datastore.IMemoRepository
 import java.util.Calendar
@@ -53,15 +54,15 @@ class StatisticsManager(
 
     fun names(): List<String> {
         val today = Calendar.getInstance()
-        val weekBefore = Calendar.getInstance().apply { add(Calendar.DATE, -7) }
+
         return memos
             .filter { it.startDate.before(today) }
             .filter { it.finishDate == null || it.finishDate!!.after(today) }
             .map { it.name }
     }
 
-    fun pillsTime(): Pair<List<List<Double>>, List<String>> {
-        val therapy = memos.firstOrNull { it.name == "test2" }
+    fun pillsTime(name: String): Pair<List<List<Double>>, List<List<String>>> {
+        val therapy = memos.firstOrNull { it.name == name }
         if (therapy == null) {
             return Pair(emptyList(), listOf())
         }
@@ -69,17 +70,26 @@ class StatisticsManager(
         Log.d("Stat_therapy_name", therapy.name)
 
         val notifications = therapy.notifications
-            .filter { it.date.after(Calendar.getInstance().apply { add(Calendar.DATE, -7) })
-                    && it.date.before(Calendar.getInstance()) }
+            .filter {
+                it.date.after(Calendar.getInstance().apply { add(Calendar.DATE, -7) })
+                        && it.date.before(Calendar.getInstance())
+            }
+        notifications.forEach {
+            Log.d("Notification: ${it.name}, ${it.baseDosageTime}", formatFullDate(it.date))
+        }
         val hours = notifications.map { it.baseDosageTime }.distinct()
 
         val series: MutableList<List<Double>> = mutableListOf()
-        hours.forEach {hour ->
+        hours.forEach { hour ->
             series.add(
                 notifications
                     .filter { it.baseDosageTime == hour }
-                    .map { it.date }
-                    .map { if (it == null) -1.0 else it.get(Calendar.HOUR_OF_DAY) + it.get(Calendar.MINUTE) / 100.0 }
+                    .map { it.intakeTime }
+                    .map {
+                        if (it == null) hour / 60 + ((hour % 60) / 100.0) else it.get(Calendar.HOUR_OF_DAY) + it.get(
+                            Calendar.MINUTE
+                        ) / 100.0
+                    }
             )
         }
         series.firstOrNull()?.forEach {
@@ -90,7 +100,30 @@ class StatisticsManager(
             .filter { it.baseDosageTime == hours.firstOrNull() }
             .map { formatDate(it.date) }
 
-        return Pair(series, xAxis)
+        val titles = hours
+            .map { formatTime(it) }
+
+        return Pair(series, listOf(xAxis, titles))
+    }
+
+    fun missed(): Pair<Double, Double> {
+        val today = Calendar.getInstance()
+        val currentMemos = memos
+            .filter { it.startDate.before(today) }
+            .filter { it.finishDate == null || it.finishDate!!.after(today) }
+
+        val currentNotifications = currentMemos
+            .flatMap { it.notifications }
+            .filter {
+                it.date.after(Calendar.getInstance().apply { add(Calendar.DATE, -7) })
+                        && it.date.before(Calendar.getInstance())
+            }
+
+        return Pair(
+            currentNotifications.count { it.intakeTime == null }.toDouble(),
+            currentNotifications.count { it.intakeTime != null }.toDouble(),
+        )
+
     }
 
 
