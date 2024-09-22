@@ -2,12 +2,10 @@ package com.szylas.medmemo.auth.presentation
 
 import android.Manifest
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
@@ -47,7 +45,7 @@ import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.main.presentation.MainActivity
-import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
+import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannels
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -97,7 +95,7 @@ class LoginActivity : ComponentActivity() {
                         }
 
                     }
-                    registerNotificationChannel(this)
+                    registerNotificationChannels(this)
 
                     Box(
                         modifier = Modifier

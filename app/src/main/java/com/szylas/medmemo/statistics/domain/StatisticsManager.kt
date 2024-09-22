@@ -71,8 +71,14 @@ class StatisticsManager(
 
         val notifications = therapy.notifications
             .filter {
-                it.date.after(Calendar.getInstance().apply { add(Calendar.DATE, -7) })
-                        && it.date.before(Calendar.getInstance())
+                it.date.after(Calendar.getInstance().apply {
+                    add(Calendar.DATE, -7)
+                    set(Calendar.HOUR_OF_DAY, 1)
+                })
+                        && it.date.before(Calendar.getInstance().apply {
+                    add(Calendar.DATE, 1)
+                    set(Calendar.HOUR_OF_DAY, 1)
+                })
             }
         notifications.forEach {
             Log.d("Notification: ${it.name}, ${it.baseDosageTime}", formatFullDate(it.date))
@@ -114,10 +120,14 @@ class StatisticsManager(
 
         val currentNotifications = currentMemos
             .flatMap { it.notifications }
-            .filter {
-                it.date.after(Calendar.getInstance().apply { add(Calendar.DATE, -7) })
-                        && it.date.before(Calendar.getInstance())
-            }
+            .filter {it.date.after(Calendar.getInstance().apply {
+                add(Calendar.DATE, -7)
+                set(Calendar.HOUR_OF_DAY, 1)
+            })
+                    && it.date.before(Calendar.getInstance().apply {
+                add(Calendar.DATE, 1)
+                set(Calendar.HOUR_OF_DAY, 1)
+            })}
 
         return Pair(
             currentNotifications.count { it.intakeTime == null }.toDouble(),

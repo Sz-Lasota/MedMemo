@@ -23,7 +23,8 @@ class FirebaseMemoRepository : IMemoRepository {
                         .map { toMemo(it) }
                         .toList()
                 )
-            }.addOnFailureListener {
+            }
+            .addOnFailureListener {
                 onError(it.message ?: "Unknown exception occurred during ")
             }
     }

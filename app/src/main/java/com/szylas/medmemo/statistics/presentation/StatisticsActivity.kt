@@ -92,7 +92,7 @@ class StatisticsActivity : ComponentActivity() {
                         if (!fetched) {
                             Column(
                                 modifier = Modifier
-                                    .fillMaxWidth(),
+                                    .fillMaxSize(),
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {

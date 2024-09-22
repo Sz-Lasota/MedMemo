@@ -33,6 +33,7 @@ import com.szylas.medmemo.auth.domain.Session
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.main.presentation.models.ProfileItem
+import com.szylas.medmemo.memo.presentation.PillAmountActivity
 import com.szylas.medmemo.statistics.presentation.StatisticsActivity
 
 
@@ -48,7 +49,9 @@ private val profileItems = listOf(
         icon = R.drawable.baseline_bar_chart_24
     ),
     ProfileItem(
-        navigate = { },
+        navigate = {
+            it.startActivity(Intent(it, PillAmountActivity::class.java))
+        },
         label = "Pill amount",
         icon = R.drawable.pill
     ), ProfileItem(

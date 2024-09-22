@@ -40,15 +40,15 @@ import com.szylas.medmemo.auth.domain.Session
 import com.szylas.medmemo.auth.presentation.LoginActivity
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.domain.models.MemoNotification
-import com.szylas.medmemo.common.presentation.components.PrimaryButton
-import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.components.TimePickerDialog
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
+import com.szylas.medmemo.memo.datastore.PillCountFirebaseRepository
 import com.szylas.medmemo.memo.domain.extensions.getMemo
 import com.szylas.medmemo.memo.domain.extensions.getNotification
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
+import com.szylas.medmemo.memo.domain.managers.PillAmountManager
 import com.szylas.medmemo.memo.domain.notifications.NotificationsScheduler
-import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
+import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannels
 import com.szylas.medmemo.memo.domain.predictions.IPrediction
 import com.szylas.medmemo.memo.domain.predictions.WeightedAveragePrediction
 import kotlinx.coroutines.CoroutineScope
@@ -58,6 +58,7 @@ import java.util.Calendar
 class MemoTakenFromNotificationActivity : ComponentActivity() {
 
     private val memoManager = MemoManagerProvider.memoManager
+    private val pillAmountManager = PillAmountManager(PillCountFirebaseRepository())
     private val notificationsScheduler = NotificationsScheduler(this)
 
 
@@ -65,7 +66,7 @@ class MemoTakenFromNotificationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        registerNotificationChannel(this)
+        registerNotificationChannels(this)
         enableEdgeToEdge(
         )
 
@@ -207,6 +208,21 @@ class MemoTakenFromNotificationActivity : ComponentActivity() {
         memo.notifications[indexOfNotification].intakeTime =
             time
         notification.intakeTime = time
+
+        lifecycleScope.decreaseAmount(
+            memo = memo,
+            onSuccess = {
+                Log.d("PillAmount", it)
+            },
+            onError = {
+                Log.e("PillAmount", it)
+            },
+            onAlarm = {
+                notificationsScheduler.scheduleLowPillNotification(memo.name)
+            }
+        )
+
+
         if (memo.smartMode) {
             lifecycleScope.rescheduleNotification(
                 memo,
@@ -269,6 +285,15 @@ class MemoTakenFromNotificationActivity : ComponentActivity() {
             onError,
             onSessionNotFound
         )
+    }
+
+    private fun CoroutineScope.decreaseAmount(
+        memo: Memo,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+        onAlarm: () -> Unit
+    ) = launch {
+        pillAmountManager.decrease(memo, onSuccess, onError, onAlarm)
     }
 
     private fun CoroutineScope.updateMemo(

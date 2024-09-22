@@ -27,7 +27,7 @@ fun TextInput(
         onValueChange = onValueChange,
         modifier = modifier,
         shape = RoundedCornerShape(cornerRadius),
-        maxLines = 3,
+        maxLines = 1,
         keyboardOptions = keyboardOptions,
         isError = error,
         singleLine = singleLine,

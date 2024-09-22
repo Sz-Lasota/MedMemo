@@ -60,9 +60,17 @@
             android:exported="false"
             android:label="@string/statistics"
             android:theme="@style/Theme.MedMemo" />
+        <activity
+            android:name=".memo.presentation.PillAmountActivity"
+            android:exported="false"
+            android:label="@string/pillamount"
+            android:theme="@style/Theme.MedMemo" />
 
         <receiver
             android:name=".memo.domain.notifications.MemoNotificationReceiver"
+            android:enabled="true" />
+        <receiver
+            android:name=".memo.domain.notifications.PillAmountNotificationReceiver"
             android:enabled="true" />
     </application>
 

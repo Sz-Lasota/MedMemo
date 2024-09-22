@@ -1,15 +1,9 @@
 package com.szylas.medmemo.memo.presentation
 
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -34,7 +28,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,9 +51,8 @@ import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.memo.domain.extensions.generateNotifications
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
-import com.szylas.medmemo.memo.domain.notifications.MemoNotificationReceiver
 import com.szylas.medmemo.memo.domain.notifications.NotificationsScheduler
-import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
+import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannels
 import com.szylas.medmemo.memo.presentation.components.StatusBarManager
 import com.szylas.medmemo.memo.presentation.models.MemoDateScreen
 import com.szylas.medmemo.memo.presentation.models.MemoNameScreen
@@ -102,7 +94,7 @@ class NewMemoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        registerNotificationChannel(this)
+        registerNotificationChannels(this)
 
         enableEdgeToEdge(
         )
@@ -181,7 +173,7 @@ class NewMemoActivity : ComponentActivity() {
                                 MemoSummaryFragment(
                                     activity = this@NewMemoActivity,
                                     statusBarManager = statusManager,
-                                    memo = memo
+                                    memo = memo,
                                 ) {
                                     Log.w("MEMO_PERSIST", "Generating")
                                     memo.generateNotifications()
@@ -240,34 +232,8 @@ class NewMemoActivity : ComponentActivity() {
         }
     }
 
-    private fun scheduleNotifications(memo: Memo) {
-        memo.notifications.forEach {
-            val intent = Intent(applicationContext, MemoNotificationReceiver::class.java).apply {
-                putExtra("NOTIFICATION", it)
-                putExtra("MEMO", memo)
-            }
 
-            val pendingIntent = PendingIntent.getBroadcast(
-                applicationContext,
-                it.notificationId,
-                intent,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-
-            val alarm = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-            Log.d("SCHEDULE", "Notification (id: ${it.notificationId}, name: ${it.name}) scheduled at: ${it.date.timeInMillis}")
-
-            alarm.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                it.date.timeInMillis,
-                pendingIntent
-            )
-        }
-    }
-
-
-    fun CoroutineScope.persist(
+    private fun CoroutineScope.persist(
         memo: Memo,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit,

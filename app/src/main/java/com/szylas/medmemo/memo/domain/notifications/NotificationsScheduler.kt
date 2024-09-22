@@ -32,13 +32,17 @@ class NotificationsScheduler(private val context: Context) {
         cancelAlarm(memo, notification)
     }
 
+    fun scheduleLowPillNotification(name: String) {
+        scheduleLowPillAlarm(name)
+    }
+
     suspend fun rescheduleNotifications(
         memo: Memo,
         lastNotification: MemoNotification,
         prediction: IPrediction,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit,
-        onSessionNotFound: (String) -> Unit
+        onSessionNotFound: (String) -> Unit,
     ) {
         val pendingNotification = memo.notifications
             .filter { it.baseDosageTime == lastNotification.baseDosageTime }
@@ -67,6 +71,28 @@ class NotificationsScheduler(private val context: Context) {
             onSessionNotFound
         )
 
+    }
+
+    private fun scheduleLowPillAlarm(name: String) {
+        val intent =
+            Intent(context.applicationContext, PillAmountNotificationReceiver::class.java).apply {
+                putExtra("NAME", name)
+            }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            context.applicationContext,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val alarm = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        alarm.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            Calendar.getInstance().timeInMillis + 15 * 60 * 1000L,
+            pendingIntent
+        )
     }
 
     private fun scheduleAlarm(memo: Memo, memoNotification: MemoNotification) {

@@ -14,7 +14,7 @@ import com.szylas.medmemo.memo.presentation.MemoTakenFromNotificationActivity
 
 class NotificationProvider {
 
-    fun provide(memo: Memo, memoNotification: MemoNotification, context: Context): Notification {
+    fun provideMemoNotification(memo: Memo, memoNotification: MemoNotification, context: Context): Notification {
         val intent = Intent(context, MemoTakenFromNotificationActivity::class.java).apply {
             putExtra("NOTIFICATION", memoNotification)
             putExtra("MEMO", memo)
@@ -34,6 +34,15 @@ class NotificationProvider {
             .setOngoing(true)
             .setAutoCancel(true)
             .setContentIntent(medTakenIntent)
+            .build()
+    }
+
+    fun provideLowPillsNotification(name: String, context: Context): Notification {
+        return NotificationCompat.Builder(context, NotificationStore.COUNT_ID)
+            .setContentText("Your medications are running low...")
+            .setContentTitle(name)
+            .setSmallIcon(R.drawable.ic_app_img)
+            .setAutoCancel(true)
             .build()
     }
 

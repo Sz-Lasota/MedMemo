@@ -77,4 +77,17 @@
     <string name="adherence">Adherence</string>
     <string name="missed">Missed</string>
     <string name="taken">Taken</string>
+    <string name="pillamount">PillAmount</string>
+    <string name="there_are_no_active_pillcounts">There are no active pillCounts</string>
+    <string name="therapy">Therapy</string>
+    <string name="create_new_pill_tracker">Create new pill tracker</string>
+    <string name="choose_therapy">Choose therapy:</string>
+    <string name="pills_amount">Pills amount</string>
+    <string name="enter_new_amount_of_pills">Enter new amount of pills:</string>
+    <string name="enter_amount_of_pills">Enter amount of pills:</string>
+    <string name="delete">Delete</string>
+    <string name="optionally">Optionally:</string>
+    <string name="not_set">Not set</string>
+    <string name="initial_amount">Initial amount:</string>
+    <string name="successfully_add_pill_count">Successfully add pill count</string>
 </resources>

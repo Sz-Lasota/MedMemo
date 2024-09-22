@@ -1,8 +1,5 @@
 package com.szylas.medmemo.main.presentation
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,13 +7,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -55,9 +50,8 @@ import com.szylas.medmemo.main.presentation.views.CalendarFragment
 import com.szylas.medmemo.main.presentation.views.HomeFragment
 import com.szylas.medmemo.main.presentation.views.ProfileFragment
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
-import com.szylas.medmemo.memo.domain.notifications.MemoNotificationReceiver
 import com.szylas.medmemo.memo.domain.notifications.NotificationsScheduler
-import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
+import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannels
 import com.szylas.medmemo.memo.presentation.NewMemoActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -157,7 +151,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ) { innerPadding ->
-                    registerNotificationChannel(this)
+                    registerNotificationChannels(this)
                     Box(
                         modifier = Modifier
                             .paint(

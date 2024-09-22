@@ -11,8 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.szylas.medmemo.memo.domain.extensions.getMemo
 import com.szylas.medmemo.memo.domain.extensions.getNotification
 
-class MemoNotificationReceiver : BroadcastReceiver() {
-
+class PillAmountNotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
 
         Log.i("NOTIFICATION", "Notify")
@@ -30,13 +29,10 @@ class MemoNotificationReceiver : BroadcastReceiver() {
         Log.i("NOTIFICATION", "Sending")
         registerNotificationChannels(context)
 
-        val memo = intent.getMemo()
-        val memoNotification = intent.getNotification()
-        val notification = notificationProvider.provideMemoNotification(memo, memoNotification, context)
+        val name = intent.getStringExtra("NAME") ?: "Unknown"
+        val notification = notificationProvider.provideLowPillsNotification(name, context)
 
         val notificationManager = NotificationManagerCompat.from(context)
-        notificationManager.notify(memoNotification.notificationId, notification)
+        notificationManager.notify(0, notification)
     }
-
 }
-

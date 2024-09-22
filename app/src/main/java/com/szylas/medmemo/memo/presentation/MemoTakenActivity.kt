@@ -14,26 +14,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberTimePickerState
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,17 +40,15 @@ import com.szylas.medmemo.auth.domain.Session
 import com.szylas.medmemo.auth.presentation.LoginActivity
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.domain.models.MemoNotification
-import com.szylas.medmemo.common.presentation.components.PrimaryButton
-import com.szylas.medmemo.common.presentation.components.SecondaryButton
 import com.szylas.medmemo.common.presentation.components.TimePickerDialog
-import com.szylas.medmemo.common.presentation.style.TextStyleOption
-import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
+import com.szylas.medmemo.memo.datastore.PillCountFirebaseRepository
 import com.szylas.medmemo.memo.domain.extensions.getMemo
 import com.szylas.medmemo.memo.domain.extensions.getNotification
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
+import com.szylas.medmemo.memo.domain.managers.PillAmountManager
 import com.szylas.medmemo.memo.domain.notifications.NotificationsScheduler
-import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannel
+import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannels
 import com.szylas.medmemo.memo.domain.predictions.IPrediction
 import com.szylas.medmemo.memo.domain.predictions.WeightedAveragePrediction
 import kotlinx.coroutines.CoroutineScope
@@ -64,15 +56,17 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 
 class MemoTakenActivity : ComponentActivity() {
+
     private val memoManager = MemoManagerProvider.memoManager
     private val notificationsScheduler = NotificationsScheduler(this)
+    private val pillAmountManager = PillAmountManager(PillCountFirebaseRepository())
 
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        registerNotificationChannel(this)
+        registerNotificationChannels(this)
         enableEdgeToEdge(
         )
 
@@ -95,11 +89,6 @@ class MemoTakenActivity : ComponentActivity() {
                             fontWeight = FontWeight.Medium,
                         )
 
-                    }, navigationIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(id = R.string.cancel)
-                        )
                     })
                 }) { innerPadding ->
                     Box(
@@ -110,59 +99,76 @@ class MemoTakenActivity : ComponentActivity() {
                         val timePickerState = rememberTimePickerState()
                         var showTimePicker by remember { mutableStateOf(false) }
                         Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Text(
-                                text = memo.name,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth(),
-                                style = TextStyleProvider.provide(
-                                    style = TextStyleOption.TITLE_LARGE
-                                )
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                text = stringResource(R.string.when_did_you_take_your, memo.name),
+                                style = MaterialTheme.typography.headlineLarge
                             )
 
                             Spacer(modifier = Modifier.weight(1f))
-
                             Button(
-                                onClick = {
-                                    cancelNotification(memo, notification)
-                                    nowClicked(memo = memo, notification = notification)
-                                },
                                 modifier = Modifier
-                                    .fillMaxWidth()
+                                    .fillMaxWidth(),
+                                onClick = {
+                                    medTakenClick(
+                                        memo,
+                                        notification,
+                                        Calendar.getInstance()
+                                    )
+                                }
                             ) {
-                                Text(text = stringResource(R.string.med_taken_now))
+                                Text(text = stringResource(R.string.now))
                             }
 
                             Button(
-                                onClick = { showTimePicker = true },
-                                modifier = Modifier
-                                    .fillMaxWidth()
+                                modifier =  Modifier
+                                    .fillMaxWidth(),
+                                onClick = { showTimePicker = true }
                             ) {
-                                Text(text = stringResource(R.string.taken_at))
+                                Text(text = stringResource(R.string.at_))
                             }
 
-                            OutlinedButton(
-                                onClick = {
-                                    cancelNotification(memo, notification)
-                                    finish()
-                                },
-                                modifier = Modifier.fillMaxWidth()
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                text = stringResource(R.string.not_planning_to_take_your_med)
+                            )
+
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors().copy(
+                                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                                ),
+                                onClick = { finish() }
                             ) {
-                                Text(text = stringResource(R.string.pass_med))
+                                Text(text = "Pass")
                             }
                         }
 
                         if (showTimePicker) {
-                            TimePickerDialog(onDismissRequest = { showTimePicker = false },
+                            TimePickerDialog(
+                                onDismissRequest = { showTimePicker = false },
                                 confirmButton = {
-                                    TextButton(onClick = {
-                                        cancelNotification(memo, notification)
-                                        timePickerConfirm(memo, notification, timePickerState)
-                                        showTimePicker = false
-                                    }) {
+                                    TextButton(
+                                        onClick = {
+                                            medTakenClick(
+                                                memo = memo,
+                                                notification = notification,
+                                                time = Calendar.getInstance().apply {
+                                                    set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                                                    set(Calendar.MINUTE, timePickerState.minute)
+                                                })
+                                            showTimePicker = false
+                                        }) {
                                         Text(
                                             text = stringResource(
                                                 R.string.ok
@@ -178,7 +184,8 @@ class MemoTakenActivity : ComponentActivity() {
                                             text = stringResource(R.string.cancel), fontSize = 18.sp
                                         )
                                     }
-                                }) {
+                                }
+                            ) {
                                 TimePicker(state = timePickerState)
                             }
 
@@ -189,78 +196,93 @@ class MemoTakenActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    private fun timePickerConfirm(
+    private fun medTakenClick(
         memo: Memo,
         notification: MemoNotification,
-        timePickerState: TimePickerState,
+        time: Calendar,
     ) {
-        val indexOfNotification =
-            memo.notifications.indexOf(memo.notifications.firstOrNull { it.notificationId == notification.notificationId })
+        Log.d("Hello", "Hello")
 
+        val indexOfNotification = memo.notifications.indexOf(
+            memo.notifications
+                .firstOrNull { it.notificationId == notification.notificationId }
+        )
         memo.notifications[indexOfNotification].intakeTime =
-            Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                set(Calendar.MINUTE, timePickerState.minute)
+            time
+        notification.intakeTime = time
+
+        lifecycleScope.decreaseAmount(
+            memo = memo,
+            onSuccess = {
+                Log.d("PillAmount", it)
+            },
+            onError = {
+                Log.e("PillAmount", it)
+            },
+            onAlarm = {
+                notificationsScheduler.scheduleLowPillNotification(memo.name)
             }
+        )
 
-        lifecycleScope.medTaken(
-            memo,
-            notification,
-            WeightedAveragePrediction(),
-            onSuccess = {
-                finish()
-            },
-            onError = {
-                Toast.makeText(
-                    this@MemoTakenActivity,
-                    "Unable to save intake time: $it! Check your internet connection or try again later!",
-                    Toast.LENGTH_SHORT,
-                ).show()
-            },
-            onSessionNotFound = {
-                Log.e("SESSION", "Session not found")
-            })
-    }
-
-    private fun nowClicked(
-        memo: Memo,
-        notification: MemoNotification,
-    ) {
-        val indexOfNotification =
-            memo.notifications.indexOf(memo.notifications.firstOrNull { it.notificationId == notification.notificationId })
-        memo.notifications[indexOfNotification].intakeTime =
-            Calendar.getInstance()
-
-        lifecycleScope.medTaken(
-            memo,
-            notification,
-            WeightedAveragePrediction(),
-            onSuccess = {
-                finish()
-            },
-            onError = {
-                Toast.makeText(
-                    this@MemoTakenActivity,
-                    "Unable to save intake time: $it! Check your internet connection or try again later!",
-                    Toast.LENGTH_SHORT,
-                ).show()
-            },
-            onSessionNotFound = {
-                Log.e("SESSION", "Session not found")
-            })
-
-        Log.d("MED", "Taken now ${notification.date}")
-    }
-
-    private fun cancelNotification(
-        memo: Memo,
-        notification: MemoNotification,
-    ) {
         notificationsScheduler.cancelNotification(memo, notification)
+
+        if (memo.smartMode) {
+            lifecycleScope.rescheduleNotification(
+                memo,
+                notification,
+                WeightedAveragePrediction(),
+                onSuccess = {
+                    Toast.makeText(
+                        this@MemoTakenActivity,
+                        "Intake time successfully updated!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    finish()
+                }, onError = {
+                    Toast.makeText(
+                        this@MemoTakenActivity,
+                        "Unable to save intake time: $it! Check your internet connection or try again later!",
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }, onSessionNotFound = {
+                    Log.e("SESSION", "Session not found")
+                }
+            )
+            return
+        }
+
+        lifecycleScope.updateMemo(
+            memo = memo,
+            notification = notification,
+            onSuccess = {
+                Toast.makeText(
+                    this@MemoTakenActivity,
+                    "Intake time successfully updated!",
+                    Toast.LENGTH_SHORT
+                ).show()
+                finish()
+            }, onError = {
+                Toast.makeText(
+                    this@MemoTakenActivity,
+                    "Unable to save intake time: $it! Check your internet connection or try again later!",
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }, onSessionNotFound = {
+                Log.e("SESSION", "Session not found")
+            }
+        )
     }
 
-    private fun CoroutineScope.medTaken(
+    private fun CoroutineScope.decreaseAmount(
+        memo: Memo,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+        onAlarm: () -> Unit
+    ) = launch {
+        pillAmountManager.decrease(memo, onSuccess, onError, onAlarm)
+    }
+
+    private fun CoroutineScope.rescheduleNotification(
         memo: Memo,
         lastNotification: MemoNotification,
         prediction: IPrediction,
@@ -268,13 +290,23 @@ class MemoTakenActivity : ComponentActivity() {
         onError: (String) -> Unit,
         onSessionNotFound: (String) -> Unit,
     ) = launch {
-        if (memo.smartMode) {
-            notificationsScheduler.rescheduleNotifications(
-                memo, lastNotification, prediction, onSuccess, onError, onSessionNotFound
-            )
-        } else {
-            memoManager.updateMemo(memo, lastNotification, onSuccess, onError, onSessionNotFound)
-        }
+        notificationsScheduler.rescheduleNotifications(
+            memo,
+            lastNotification,
+            prediction,
+            onSuccess,
+            onError,
+            onSessionNotFound
+        )
     }
 
+    private fun CoroutineScope.updateMemo(
+        memo: Memo,
+        notification: MemoNotification,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+        onSessionNotFound: (String) -> Unit,
+    ) = launch {
+        memoManager.updateMemo(memo, notification, onSuccess, onError, onSessionNotFound)
+    }
 }
