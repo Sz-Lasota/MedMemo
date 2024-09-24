@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,9 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -45,6 +49,7 @@ import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.memo.domain.extensions.provideTimes
 import com.szylas.medmemo.memo.presentation.components.StatusBarManager
+import com.szylas.medmemo.memo.presentation.components.TooltipModal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +59,13 @@ fun MemoTimeFragment(
     memo: Memo,
     navigation: () -> Unit,
 ) {
+    var isModeTooltip by remember {
+        mutableStateOf(false)
+    }
+    var isTimeTooltip by remember {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -81,12 +93,22 @@ fun MemoTimeFragment(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(R.string.reminder_mode),
-            style = MaterialTheme.typography.titleLarge,
-            softWrap = true
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.reminder_mode),
+                style = MaterialTheme.typography.titleLarge,
+                softWrap = true
+            )
+            Icon(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .clickable { isModeTooltip = true },
+                imageVector = Icons.Default.Info,
+                contentDescription = stringResource(R.string.name_tooltip)
+            )
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -102,12 +124,23 @@ fun MemoTimeFragment(
             Spacer(modifier = Modifier.weight(1f))
             Text(text = stringResource(R.string.smart_mode), fontSize = 20.sp)
         }
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(R.string.hours_of_dosing),
-            style = MaterialTheme.typography.titleLarge,
-            softWrap = true
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+
+        ) {
+            Text(
+                text = stringResource(R.string.hours_of_dosing),
+                style = MaterialTheme.typography.titleLarge,
+                softWrap = true
+            )
+            Icon(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .clickable { isTimeTooltip = true },
+                imageVector = Icons.Default.Info,
+                contentDescription = stringResource(R.string.name_tooltip)
+            )
+        }
         Button(onClick = { showTimePicker = true }, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(id = R.string.add))
         }
@@ -124,7 +157,9 @@ fun MemoTimeFragment(
                     onEdit = { newHour ->
                         if (hours.contains(newHour)) {
                             Toast.makeText(
-                                activity, activity.getString(R.string.already_exists), Toast.LENGTH_SHORT
+                                activity,
+                                activity.getString(R.string.already_exists),
+                                Toast.LENGTH_SHORT
                             ).show()
                             return@ListItem
                         }
@@ -163,6 +198,26 @@ fun MemoTimeFragment(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(id = R.string.next))
+        }
+
+        if (isModeTooltip) {
+            TooltipModal(
+                title = stringResource(id = R.string.reminder_mode), body = stringResource(
+                    R.string.mode_tooltip
+                )
+            ) {
+                isModeTooltip = false
+            }
+        }
+
+        if (isTimeTooltip) {
+            TooltipModal(
+                title = stringResource(id = R.string.hours_of_dosing), body = stringResource(
+                    R.string.time_tooltip
+                )
+            ) {
+                isTimeTooltip = false
+            }
         }
 
         if (showTimePicker) {

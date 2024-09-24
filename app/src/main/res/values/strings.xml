@@ -90,4 +90,16 @@
     <string name="not_set">Not set</string>
     <string name="initial_amount">Initial amount:</string>
     <string name="successfully_add_pill_count">Successfully add pill count</string>
+    <string name="name_tooltip">Name tooltip</string>
+    <string name="name_tooltip_body">This is treatment name, it will be visible as title of every notification for this treatment. It will also be title for counting amount of remaining pills if you enable this feature.</string>
+    <string name="dosage_tooltip">Number of doses is how many times a day you have to take your pills. Based on this information and gap data, app will prepare suggested hours for your pill taking.</string>
+    <string name="gap_tooltip">Gap between doses is time between two following medication doses. This information will be used to prepare suggested hours of pills intake.</string>
+    <string name="mode_tooltip">Mode in which reminder will be send. If smart mode is chosen, time when reminder should be send will be calculated based, on previous intake times. If strict mode is selected, then reminder will be send at chosen hours.</string>
+    <string name="time_tooltip">This are hours when reminder will be send. You can add as many as you want and change existing.</string>
+    <string name="start_tooltip">This is starting date of therapy, from this day reminders will be sent.</string>
+    <string name="finish_tooltip">Finish date of therapy, till this day reminders will be send. It is optional, if not chosen reminders will be send till therapy is cancelled.</string>
+    <string name="finish_date_">Finish date</string>
+    <string name="add_pill_counter">Add pill counter</string>
+    <string name="pill_counter">Pill counter</string>
+    <string name="amount_tooltip">You can add number of pills that you have, for app to track amount of them. After every intake, number of pills will be decreased by one. If number of meds will drop bellow 45% of initial value, notification with warning will be send. It is optional, if you pass it now, you can always enable it in profile screen, in pill amount menu.</string>
 </resources>

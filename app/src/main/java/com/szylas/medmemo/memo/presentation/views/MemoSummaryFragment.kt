@@ -3,6 +3,7 @@ package com.szylas.medmemo.memo.presentation.views
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,8 +13,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -23,6 +27,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -46,6 +51,7 @@ import com.szylas.medmemo.memo.datastore.models.PillCount
 import com.szylas.medmemo.memo.domain.extensions.id
 import com.szylas.medmemo.memo.domain.managers.PillAmountManager
 import com.szylas.medmemo.memo.presentation.components.StatusBarManager
+import com.szylas.medmemo.memo.presentation.components.TooltipModal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -58,6 +64,10 @@ fun MemoSummaryFragment(
     memo: Memo,
     navigation: () -> Unit,
 ) {
+
+    var isPillCountTooltip by remember {
+        mutableStateOf(false)
+    }
 
     var isDialogOpen by remember {
         mutableStateOf(false)
@@ -171,12 +181,29 @@ fun MemoSummaryFragment(
             text = stringResource(R.string.optionally),
             style = MaterialTheme.typography.headlineSmall
         )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                modifier = Modifier,
+                style = MaterialTheme.typography.titleLarge,
+                text = stringResource(R.string.pill_counter),
+                softWrap = true
+            )
+            Icon(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .clickable { isPillCountTooltip = true },
+                imageVector = Icons.Default.Info,
+                contentDescription = stringResource(R.string.name_tooltip)
+            )
+        }
 
         Button(
             onClick = { isDialogOpen = true },
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(text = "Add pill counter")
+            Text(text = stringResource(R.string.add_pill_counter))
         }
 
         Column(
@@ -245,6 +272,13 @@ fun MemoSummaryFragment(
         ) {
             Text(text = stringResource(R.string.finish))
         }
+
+        if (isPillCountTooltip) {
+            TooltipModal(title = stringResource(id = R.string.pill_counter), body = stringResource(R.string.amount_tooltip)) {
+                isPillCountTooltip = false
+            }
+        }
+
         if (isDialogOpen) {
             PillCountDialog(
                 init = pillCount?.count,
