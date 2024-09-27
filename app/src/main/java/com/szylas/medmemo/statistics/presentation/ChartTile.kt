@@ -1,16 +1,19 @@
 package com.szylas.medmemo.statistics.presentation
 
+import android.util.Log
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
+import com.szylas.medmemo.common.domain.formatters.formatTime
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
@@ -18,11 +21,14 @@ import ir.ehsannarmani.compose_charts.models.DividerProperties
 import ir.ehsannarmani.compose_charts.models.DotProperties
 import ir.ehsannarmani.compose_charts.models.DrawStyle
 import ir.ehsannarmani.compose_charts.models.GridProperties
+import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
+import ir.ehsannarmani.compose_charts.models.IndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.LineProperties
 import ir.ehsannarmani.compose_charts.models.Pie
+import ir.ehsannarmani.compose_charts.models.PopupProperties
 import ir.ehsannarmani.compose_charts.models.StrokeStyle
 
 private val colors = listOf(
@@ -41,7 +47,11 @@ fun LineChartTile(data: List<List<Double>>, labels: List<String>, titles: List<S
         .mapIndexed { index, it ->
             Line(
                 label = titles[index],
+                curvedEdges = false,
                 values = it,
+                popupProperties = PopupProperties(
+                    enabled = false
+                ),
                 color = SolidColor(colors[index % colors.size]),
                 dotProperties = DotProperties(
                     enabled = true,
@@ -61,6 +71,25 @@ fun LineChartTile(data: List<List<Double>>, labels: List<String>, titles: List<S
     }
     LineChart(
         modifier = modifier,
+        dividerProperties = DividerProperties(
+            enabled = true,
+            xAxisProperties = LineProperties(
+                enabled = false
+            )
+        ),
+        indicatorProperties = HorizontalIndicatorProperties(
+            enabled = true,
+            contentBuilder = {
+                Log.d("TimeLabel", it.toString())
+                val hour = it.toInt()
+                val minute = ((it - hour) * 100).toInt()
+                if (minute >= 60) {
+                    ""
+                } else {
+                    formatTime(hour * 60 + minute)
+                }
+            }
+        ),
         labelProperties = LabelProperties(
             enabled = true,
             labels = labels

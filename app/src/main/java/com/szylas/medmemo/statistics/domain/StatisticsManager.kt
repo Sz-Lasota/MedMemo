@@ -72,7 +72,7 @@ class StatisticsManager(
         val notifications = therapy.notifications
             .filter {
                 it.date.after(Calendar.getInstance().apply {
-                    add(Calendar.DATE, -7)
+                    add(Calendar.DATE, -5)
                     set(Calendar.HOUR_OF_DAY, 1)
                 })
                         && it.date.before(Calendar.getInstance().apply {
@@ -121,7 +121,7 @@ class StatisticsManager(
         val currentNotifications = currentMemos
             .flatMap { it.notifications }
             .filter {it.date.after(Calendar.getInstance().apply {
-                add(Calendar.DATE, -7)
+                add(Calendar.DATE, -5)
                 set(Calendar.HOUR_OF_DAY, 1)
             })
                     && it.date.before(Calendar.getInstance().apply {

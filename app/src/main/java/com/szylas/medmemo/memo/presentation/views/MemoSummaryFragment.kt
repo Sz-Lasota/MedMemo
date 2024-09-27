@@ -282,6 +282,7 @@ fun MemoSummaryFragment(
         if (isDialogOpen) {
             PillCountDialog(
                 init = pillCount?.count,
+                activity = activity,
                 onConfirm = {
                     pillCount = it
                     pillCount!!.id = memo.id()
@@ -311,6 +312,7 @@ private fun CoroutineScope.update(
 @Composable
 private fun PillCountDialog(
     init: Int?,
+    activity: ComponentActivity,
     onConfirm: (PillCount) -> Unit,
     onDelete: () -> Unit,
     onDismiss: () -> Unit,
@@ -359,6 +361,14 @@ private fun PillCountDialog(
                     Text(text = stringResource(id = R.string.cancel))
                 }
                 TextButton(onClick = {
+                    if (count.isBlank() || count.toInt() <= 1) {
+                        Toast.makeText(
+                            activity,
+                            "Pill amount should be greater than one!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@TextButton
+                    }
                     onConfirm(
                         PillCount(
                             count = count.toInt(),

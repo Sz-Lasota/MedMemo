@@ -200,6 +200,24 @@ fun MemoNameFragment(
         Spacer(modifier = Modifier.weight(0.2f))
         Button(
             onClick = {
+                if (memo.name.isBlank()) {
+                    Toast.makeText(
+                        activity,
+                        activity.getString(R.string.memo_name_cannot_be_blank),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@Button
+                }
+
+                if (numberOfDoses.isBlank() || memo.numberOfDoses < 1) {
+                    Toast.makeText(
+                        activity,
+                        activity.getString(R.string.there_must_be_at_least_one_dose),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@Button
+                }
+
                 if (memo.gap * (memo.numberOfDoses - 1) > 23 * 60 + 59) {
                     Toast.makeText(
                         activity,
@@ -208,6 +226,7 @@ fun MemoNameFragment(
                     ).show()
                     return@Button
                 }
+
                 navigation()
             },
             modifier = Modifier.fillMaxWidth()

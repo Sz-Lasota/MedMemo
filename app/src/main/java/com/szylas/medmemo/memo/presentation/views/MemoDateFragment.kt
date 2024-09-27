@@ -177,7 +177,19 @@ fun MemoDateFragment(
         statusBarManager.StatusBar()
         Spacer(modifier = Modifier.weight(0.2f))
         Button(
-            onClick = navigation,
+            onClick = {
+
+                if (!endless && memo.finishDate == null) {
+                    Toast.makeText(
+                        activity,
+                        activity.getString(R.string.therapy_is_marked_not_endless_but_no_finish_date_is_provided),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@Button
+                }
+
+                navigation()
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(id = R.string.next))

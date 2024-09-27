@@ -194,7 +194,17 @@ fun MemoTimeFragment(
         statusBarManager.StatusBar()
         Spacer(modifier = Modifier.weight(0.2f))
         Button(
-            onClick = navigation,
+            onClick = {
+                if (hours.isEmpty()) {
+                    Toast.makeText(
+                        activity,
+                        activity.getString(R.string.there_must_be_at_least_one_dose),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@Button
+                }
+                navigation()
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(id = R.string.next))

@@ -102,4 +102,7 @@
     <string name="add_pill_counter">Add pill counter</string>
     <string name="pill_counter">Pill counter</string>
     <string name="amount_tooltip">You can add number of pills that you have, for app to track amount of them. After every intake, number of pills will be decreased by one. If number of meds will drop bellow 45% of initial value, notification with warning will be send. It is optional, if you pass it now, you can always enable it in profile screen, in pill amount menu.</string>
+    <string name="memo_name_cannot_be_blank">Memo name cannot be blank!</string>
+    <string name="there_must_be_at_least_one_dose">There must be at least one dose!</string>
+    <string name="therapy_is_marked_not_endless_but_no_finish_date_is_provided">Therapy is marked not endless, but no finish date is provided!</string>
 </resources>
