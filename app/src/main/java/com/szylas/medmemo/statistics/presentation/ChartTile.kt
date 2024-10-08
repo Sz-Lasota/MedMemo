@@ -65,7 +65,7 @@ fun LineChartTile(data: List<List<Double>>, labels: List<String>, titles: List<S
             )
         }
 
-    var minValue = data.flatten().min() - 1.0
+    var minValue = data.flatten().min() - 60.0
     if (minValue < 0) {
         minValue = 0.0
     }
@@ -80,14 +80,7 @@ fun LineChartTile(data: List<List<Double>>, labels: List<String>, titles: List<S
         indicatorProperties = HorizontalIndicatorProperties(
             enabled = true,
             contentBuilder = {
-                Log.d("TimeLabel", it.toString())
-                val hour = it.toInt()
-                val minute = ((it - hour) * 100).toInt()
-                if (minute >= 60) {
-                    ""
-                } else {
-                    formatTime(hour * 60 + minute)
-                }
+                formatTime(it.toInt())
             }
         ),
         labelProperties = LabelProperties(

@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.szylas.medmemo.R
 import com.szylas.medmemo.auth.domain.Session
+import com.szylas.medmemo.common.presentation.SettingsActivity
 import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.main.presentation.models.ProfileItem
@@ -39,7 +40,7 @@ import com.szylas.medmemo.statistics.presentation.StatisticsActivity
 
 private val profileItems = listOf(
     ProfileItem(
-        navigate = { },
+        navigate = { it.startActivity(Intent(it, SettingsActivity::class.java)) },
         label = "Settings",
         icon = R.drawable.settings
     ),

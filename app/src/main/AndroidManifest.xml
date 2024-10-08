@@ -65,6 +65,11 @@
             android:exported="false"
             android:label="@string/pillamount"
             android:theme="@style/Theme.MedMemo" />
+        <activity
+            android:name=".common.presentation.SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings"
+            android:theme="@style/Theme.MedMemo" />
 
         <receiver
             android:name=".memo.domain.notifications.MemoNotificationReceiver"

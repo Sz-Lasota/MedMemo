@@ -69,12 +69,12 @@
     <string name="today_pills">Today pills</string>
     <string name="when_did_you_take_your">When did you take your %1$s?</string>
     <string name="now">Now</string>
-    <string name="at_">At ...</string>
+    <string name="at_">At …</string>
     <string name="not_planning_to_take_your_med">Not planning to take your med?</string>
     <string name="active_therapies">Active therapies</string>
     <string name="there_are_no_active_therapies">There are no active therapies!</string>
     <string name="not_enough_data">Not enough data</string>
-    <string name="adherence">Adherence</string>
+    <string name="adherence">Adherence this week</string>
     <string name="missed">Missed</string>
     <string name="taken">Taken</string>
     <string name="pillamount">PillAmount</string>
@@ -105,4 +105,5 @@
     <string name="memo_name_cannot_be_blank">Memo name cannot be blank!</string>
     <string name="there_must_be_at_least_one_dose">There must be at least one dose!</string>
     <string name="therapy_is_marked_not_endless_but_no_finish_date_is_provided">Therapy is marked not endless, but no finish date is provided!</string>
+    <string name="settings">Settings</string>
 </resources>

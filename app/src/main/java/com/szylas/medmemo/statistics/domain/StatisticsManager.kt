@@ -61,7 +61,7 @@ class StatisticsManager(
             .map { it.name }
     }
 
-    fun pillsTime(name: String): Pair<List<List<Double>>, List<List<String>>> {
+    fun pillsTime(name: String, startDate: Calendar = Calendar.getInstance()): Pair<List<List<Double>>, List<List<String>>> {
         val therapy = memos.firstOrNull { it.name == name }
         if (therapy == null) {
             return Pair(emptyList(), listOf())
@@ -72,10 +72,12 @@ class StatisticsManager(
         val notifications = therapy.notifications
             .filter {
                 it.date.after(Calendar.getInstance().apply {
+                    timeInMillis = startDate.timeInMillis
                     add(Calendar.DATE, -5)
                     set(Calendar.HOUR_OF_DAY, 1)
                 })
                         && it.date.before(Calendar.getInstance().apply {
+                    timeInMillis = startDate.timeInMillis
                     add(Calendar.DATE, 1)
                     set(Calendar.HOUR_OF_DAY, 1)
                 })
@@ -92,9 +94,10 @@ class StatisticsManager(
                     .filter { it.baseDosageTime == hour }
                     .map { it.intakeTime }
                     .map {
-                        if (it == null) hour / 60 + ((hour % 60) / 100.0) else it.get(Calendar.HOUR_OF_DAY) + it.get(
-                            Calendar.MINUTE
-                        ) / 100.0
+                        if (it == null)
+                            hour.toDouble()
+                        else
+                            it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE).toDouble()
                     }
             )
         }

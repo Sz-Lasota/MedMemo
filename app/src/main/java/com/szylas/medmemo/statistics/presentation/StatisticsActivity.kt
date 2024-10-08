@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.szylas.medmemo.R
+import com.szylas.medmemo.common.domain.formatters.formatDate
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.common.presentation.theme.imageBackground
 import com.szylas.medmemo.statistics.datastore.FirebaseMemoRepository
@@ -129,13 +130,26 @@ class StatisticsActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.spacedBy(30.dp)
                 ) {
                     val pills = statisticsManager.pillsStatus(Calendar.getInstance())
-                    PillsStatus(
-                        pillsTaken = pills[0],
-                        pillsTotal = pills[1],
-                        modifier = Modifier
-                            .weight(1f)
-                    )
+                    if (pills[1] == 0) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .shadow(5.dp, RoundedCornerShape(14.dp))
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .padding(10.dp)
 
+                        ) {
+                            Text(text = stringResource(R.string.there_are_no_active_therapies))
+                        }
+                    } else {
+                        PillsStatus(
+                            pillsTaken = pills[0],
+                            pillsTotal = pills[1],
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+                    }
                     TherapiesNumber(
                         number = statisticsManager.active(),
                         modifier = Modifier
@@ -237,6 +251,14 @@ class StatisticsActivity : ComponentActivity() {
             mutableStateOf(statisticsManager.names().first())
         }
 
+        var lookupWeek by remember {
+            mutableIntStateOf(0)
+        }
+
+        var calendar by remember {
+            mutableStateOf(Calendar.getInstance())
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -244,20 +266,23 @@ class StatisticsActivity : ComponentActivity() {
                 .clip(RoundedCornerShape(14.dp))
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .padding(10.dp)
-                .height(210.dp)
+                .height(310.dp)
 
         ) {
-            val data = statisticsManager.pillsTime(lookupTreatment)
+            val data = statisticsManager.pillsTime(lookupTreatment, startDate = calendar)
 
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = {
+                    calendar = Calendar.getInstance()
                     currentTreatment =
                         if (currentTreatment == 0) treatments.size - 1 else currentTreatment - 1
                     lookupTreatment = treatments[currentTreatment]
+
                 }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -271,9 +296,53 @@ class StatisticsActivity : ComponentActivity() {
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = {
+                    calendar = Calendar.getInstance()
                     currentTreatment = (currentTreatment + 1) % treatments.size
                     lookupTreatment = treatments[currentTreatment]
                 }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "Right"
+                    )
+                }
+
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = {
+                    lookupWeek -= 5
+                    calendar = Calendar.getInstance().apply {
+                        add(Calendar.DATE, lookupWeek)
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = "Left"
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = "${formatDate(Calendar.getInstance().apply {
+                        timeInMillis = calendar.timeInMillis
+                        add(Calendar.DATE, -5)
+                    })} - ${formatDate(calendar)}",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = {
+                    if (lookupWeek + 5 > 0) {
+                        return@IconButton
+                    }
+                    lookupWeek += 5
+                    calendar = Calendar.getInstance().apply {
+                        add(Calendar.DATE, lookupWeek)
+                    }
+                },
+                    enabled = lookupWeek != 0) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = "Right"

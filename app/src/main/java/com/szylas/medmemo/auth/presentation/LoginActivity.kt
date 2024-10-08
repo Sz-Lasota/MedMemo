@@ -45,6 +45,7 @@ import com.szylas.medmemo.common.presentation.style.TextStyleOption
 import com.szylas.medmemo.common.presentation.style.TextStyleProvider
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.main.presentation.MainActivity
+import com.szylas.medmemo.memo.datastore.FirebaseMemoRepository
 import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannels
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -57,7 +58,6 @@ class LoginActivity : ComponentActivity() {
     // TODO: Configuration stored in settings, abstract manager creation
     private val authManager =
         AuthManagerProvider.use() ?: AuthManagerProvider.provide(AuthManagerConfiguration.FIREBASE)
-
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
 
