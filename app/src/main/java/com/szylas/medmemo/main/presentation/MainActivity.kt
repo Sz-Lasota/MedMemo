@@ -136,20 +136,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     },
-                    floatingActionButton = {
-                        ExtendedFloatingActionButton(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            onClick = {
-                                startActivity(
-                                    Intent(
-                                        this,
-                                        NewMemoActivity::class.java
-                                    )
-                                )
-                            }) {
-                            Text(text = stringResource(id = R.string.new_memo))
-                        }
-                    }
+
                 ) { innerPadding ->
                     registerNotificationChannels(this)
                     Box(

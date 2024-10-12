@@ -14,10 +14,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.szylas.medmemo.R
 import com.szylas.medmemo.common.domain.formatters.formatDate
@@ -34,6 +39,7 @@ import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.main.domain.getUpcomingNotifications
 import com.szylas.medmemo.memo.presentation.ManageMemoActivity
 import com.szylas.medmemo.memo.presentation.MemoTakenActivity
+import com.szylas.medmemo.memo.presentation.NewMemoActivity
 
 
 @Composable
@@ -69,6 +75,36 @@ fun HomeFragment(memos: List<Memo>?, activity: ComponentActivity) {
                     .padding(10.dp),
                 activity = activity
             )
+        }
+
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(5.dp, RoundedCornerShape(14.dp))
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(10.dp)
+                    .clickable {
+                        activity.startActivity(
+                            Intent(
+                                activity,
+                                NewMemoActivity::class.java
+                            )
+                        )
+                    },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(id = R.string.new_memo)
+                )
+                Text(
+                    text = stringResource(id = R.string.new_memo),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
 
         item {

@@ -129,6 +129,11 @@ class StatisticsActivity : ComponentActivity() {
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(30.dp)
                 ) {
+                    TherapiesNumber(
+                        number = statisticsManager.active(),
+                        modifier = Modifier
+                            .weight(1f)
+                    )
                     val pills = statisticsManager.pillsStatus(Calendar.getInstance())
                     if (pills[1] == 0) {
                         Column(
@@ -150,11 +155,7 @@ class StatisticsActivity : ComponentActivity() {
                                 .weight(1f)
                         )
                     }
-                    TherapiesNumber(
-                        number = statisticsManager.active(),
-                        modifier = Modifier
-                            .weight(1f)
-                    )
+
 
                 }
             }

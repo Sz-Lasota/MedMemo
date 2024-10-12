@@ -42,8 +42,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -54,6 +56,7 @@ import androidx.lifecycle.lifecycleScope
 import com.szylas.medmemo.R
 import com.szylas.medmemo.common.presentation.components.TextInput
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
+import com.szylas.medmemo.common.presentation.theme.imageBackground
 import com.szylas.medmemo.memo.datastore.PillCountFirebaseRepository
 import com.szylas.medmemo.memo.datastore.models.PillCount
 import com.szylas.medmemo.memo.domain.extensions.color
@@ -108,6 +111,10 @@ class PillAmountActivity : ComponentActivity() {
                 ) { innerPadding ->
                     Box(
                         modifier = Modifier
+                            .paint(
+                                imageBackground(),
+                                contentScale = ContentScale.FillBounds
+                            )
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) {
