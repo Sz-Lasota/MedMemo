@@ -227,31 +227,6 @@ class MemoTakenFromNotificationActivity : ComponentActivity() {
             }
         )
 
-
-//        if (memo.smartMode) {
-//            lifecycleScope.rescheduleNotification(
-//                memo,
-//                notification,
-//                WeightedAveragePrediction(),
-//                onSuccess = {
-//                    Toast.makeText(
-//                        this@MemoTakenFromNotificationActivity,
-//                        "Intake time successfully updated!",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                    finish()
-//                }, onError = {
-//                    Toast.makeText(
-//                        this@MemoTakenFromNotificationActivity,
-//                        "Unable to save intake time: $it! Check your internet connection or try again later!",
-//                        Toast.LENGTH_SHORT,
-//                    ).show()
-//                }, onSessionNotFound = {
-//                    Log.e("SESSION", "Session not found")
-//                }
-//            )
-//            return
-//        }
         lifecycleScope.updateMemo(
             memo = memo,
             notification = notification,
@@ -271,24 +246,6 @@ class MemoTakenFromNotificationActivity : ComponentActivity() {
             }, onSessionNotFound = {
                 Log.e("SESSION", "Session not found")
             }
-        )
-    }
-
-    private fun CoroutineScope.rescheduleNotification(
-        memo: Memo,
-        lastNotification: MemoNotification,
-        prediction: IPrediction,
-        onSuccess: (String) -> Unit,
-        onError: (String) -> Unit,
-        onSessionNotFound: (String) -> Unit,
-    ) = launch {
-        notificationsScheduler.rescheduleNotifications(
-            memo,
-            lastNotification,
-            prediction,
-            onSuccess,
-            onError,
-            onSessionNotFound
         )
     }
 

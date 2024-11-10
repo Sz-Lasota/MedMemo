@@ -201,11 +201,15 @@ class MemoTakenActivity : ComponentActivity() {
         time: Calendar,
     ) {
         Log.d("Hello", "Hello")
-
         val indexOfNotification = memo.notifications.indexOf(
             memo.notifications
-                .firstOrNull { it.notificationId == notification.notificationId }
+                .filter { it.notificationId == notification.notificationId }
+                .firstOrNull {
+                    it.date.get(Calendar.DAY_OF_YEAR) == notification.date.get(Calendar.DAY_OF_YEAR)
+                            && it.date.get(Calendar.YEAR) == notification.date.get(Calendar.YEAR)
+                }
         )
+        Log.d("UPDATE", "Index of notification: $indexOfNotification")
         memo.notifications[indexOfNotification].intakeTime =
             time
         notification.intakeTime = time
@@ -224,33 +228,27 @@ class MemoTakenActivity : ComponentActivity() {
         )
 
         notificationsScheduler.cancelNotification(memo, notification)
+        lifecycleScope.scheduleNextNotification(memo, notification)
 
-        if (memo.smartMode) {
-            lifecycleScope.rescheduleNotification(
-                memo,
-                notification,
-                WeightedAveragePrediction(),
-                onSuccess = {
-                    Toast.makeText(
-                        this@MemoTakenActivity,
-                        "Intake time successfully updated!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    finish()
-                }, onError = {
-                    Toast.makeText(
-                        this@MemoTakenActivity,
-                        "Unable to save intake time: $it! Check your internet connection or try again later!",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                }, onSessionNotFound = {
-                    Log.e("SESSION", "Session not found")
-                }
-            )
-            return
-        }
 
-        lifecycleScope.updateMemo(
+    }
+
+    private fun CoroutineScope.decreaseAmount(
+        memo: Memo,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+        onAlarm: () -> Unit
+    ) = launch {
+        pillAmountManager.decrease(memo, onSuccess, onError, onAlarm)
+    }
+
+
+    private fun CoroutineScope.scheduleNextNotification(
+        memo: Memo,
+        notification: MemoNotification,
+    ) = launch {
+        notificationsScheduler.scheduleNextNotification(memo, notification, WeightedAveragePrediction())
+        updateMemo(
             memo = memo,
             notification = notification,
             onSuccess = {
@@ -272,32 +270,6 @@ class MemoTakenActivity : ComponentActivity() {
         )
     }
 
-    private fun CoroutineScope.decreaseAmount(
-        memo: Memo,
-        onSuccess: (String) -> Unit,
-        onError: (String) -> Unit,
-        onAlarm: () -> Unit
-    ) = launch {
-        pillAmountManager.decrease(memo, onSuccess, onError, onAlarm)
-    }
-
-    private fun CoroutineScope.rescheduleNotification(
-        memo: Memo,
-        lastNotification: MemoNotification,
-        prediction: IPrediction,
-        onSuccess: (String) -> Unit,
-        onError: (String) -> Unit,
-        onSessionNotFound: (String) -> Unit,
-    ) = launch {
-        notificationsScheduler.rescheduleNotifications(
-            memo,
-            lastNotification,
-            prediction,
-            onSuccess,
-            onError,
-            onSessionNotFound
-        )
-    }
 
     private fun CoroutineScope.updateMemo(
         memo: Memo,
