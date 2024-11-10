@@ -2,7 +2,6 @@ package com.szylas.medmemo.memo.datastore
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.datastore.mappers.fromMemo
 import com.szylas.medmemo.common.datastore.mappers.toMemo
@@ -85,7 +84,15 @@ class FirebaseMemoRepository : IMemoRepository {
                     return@addOnSuccessListener
                 }
                 val obj = toMemo(entity)
-                val index = obj.notifications.indexOf(obj.notifications.firstOrNull { notif -> notif.notificationId == notification.notificationId })
+
+                val index = obj.notifications.indexOf(obj.notifications
+                    .filter{ item -> item.notificationId == notification.notificationId}
+                    .firstOrNull { item ->
+                        item.date.get(Calendar.DAY_OF_YEAR) == notification.date.get(Calendar.DAY_OF_YEAR)
+                                && item.date.get(Calendar.YEAR) == notification.date.get(Calendar.YEAR)
+                    }
+                )
+
                 obj.notifications[index].intakeTime = notification.intakeTime
                 Log.d("Updating", obj.notifications[index].toString())
                 firebase.collection(user).document(memo.id()).set(fromMemo(obj))
@@ -133,6 +140,17 @@ class FirebaseMemoRepository : IMemoRepository {
             .map { toMemo(it) }
             .filter { it.finishDate == null }
             .toList()
+    }
+
+    override suspend fun fetchMemo(
+        user: String,
+        memo: Memo,
+    ): Memo? {
+        val entity = firebase.collection(user)
+            .document(memo.id())
+            .get().await().toObject(MemoEntity::class.java)
+
+        return entity?.let { toMemo(it) }
     }
 
 

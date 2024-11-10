@@ -87,9 +87,9 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
 
-        lifecycleScope.updateEndless(onSuccess = this::scheduleNotifications, onError = {
-            Toast.makeText(this, "Error when updating memos $it!", Toast.LENGTH_SHORT).show()
-        }, onSessionNotFound = { finish() })
+//        lifecycleScope.updateEndless(onSuccess = this::scheduleNotifications, onError = {
+//            Toast.makeText(this, "Error when updating memos $it!", Toast.LENGTH_SHORT).show()
+//        }, onSessionNotFound = { finish() })
 
 
 

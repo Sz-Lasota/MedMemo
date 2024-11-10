@@ -203,8 +203,13 @@ class MemoTakenFromNotificationActivity : ComponentActivity() {
     ) {
         val indexOfNotification = memo.notifications.indexOf(
             memo.notifications
-                .firstOrNull { it.notificationId == notification.notificationId }
+                .filter { it.notificationId == notification.notificationId }
+                .firstOrNull {
+                    it.date.get(Calendar.DAY_OF_YEAR) == notification.date.get(Calendar.DAY_OF_YEAR)
+                    && it.date.get(Calendar.YEAR) == notification.date.get(Calendar.YEAR)
+                }
         )
+        Log.d("UPDATE", "Index of notification: $indexOfNotification")
         memo.notifications[indexOfNotification].intakeTime =
             time
         notification.intakeTime = time
@@ -223,30 +228,30 @@ class MemoTakenFromNotificationActivity : ComponentActivity() {
         )
 
 
-        if (memo.smartMode) {
-            lifecycleScope.rescheduleNotification(
-                memo,
-                notification,
-                WeightedAveragePrediction(),
-                onSuccess = {
-                    Toast.makeText(
-                        this@MemoTakenFromNotificationActivity,
-                        "Intake time successfully updated!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    finish()
-                }, onError = {
-                    Toast.makeText(
-                        this@MemoTakenFromNotificationActivity,
-                        "Unable to save intake time: $it! Check your internet connection or try again later!",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                }, onSessionNotFound = {
-                    Log.e("SESSION", "Session not found")
-                }
-            )
-            return
-        }
+//        if (memo.smartMode) {
+//            lifecycleScope.rescheduleNotification(
+//                memo,
+//                notification,
+//                WeightedAveragePrediction(),
+//                onSuccess = {
+//                    Toast.makeText(
+//                        this@MemoTakenFromNotificationActivity,
+//                        "Intake time successfully updated!",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                    finish()
+//                }, onError = {
+//                    Toast.makeText(
+//                        this@MemoTakenFromNotificationActivity,
+//                        "Unable to save intake time: $it! Check your internet connection or try again later!",
+//                        Toast.LENGTH_SHORT,
+//                    ).show()
+//                }, onSessionNotFound = {
+//                    Log.e("SESSION", "Session not found")
+//                }
+//            )
+//            return
+//        }
         lifecycleScope.updateMemo(
             memo = memo,
             notification = notification,

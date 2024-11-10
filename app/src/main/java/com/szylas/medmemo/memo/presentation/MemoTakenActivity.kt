@@ -67,8 +67,7 @@ class MemoTakenActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         registerNotificationChannels(this)
-        enableEdgeToEdge(
-        )
+        enableEdgeToEdge()
 
         val user = Session.user()
         if (user == null) {

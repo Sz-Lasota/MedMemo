@@ -106,8 +106,7 @@ class NewMemoActivity : ComponentActivity() {
                     TopAppBar(title = {
                         Text(
                             text = stringResource(id = R.string.app_name),
-                            modifier = Modifier
-                                .fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Medium,
                         )
@@ -117,8 +116,7 @@ class NewMemoActivity : ComponentActivity() {
                             finish()
                         }) {
                             Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Menu"
+                                imageVector = Icons.Default.Close, contentDescription = "Menu"
                             )
                         }
                     })
@@ -177,20 +175,15 @@ class NewMemoActivity : ComponentActivity() {
                                 ) {
                                     Log.w("MEMO_PERSIST", "Generating")
                                     memo.generateNotifications()
-                                    lifecycleScope.persist(
-                                        memo = memo,
-                                        onSuccess = {
-                                            Log.d("MEMO_PERSIST", "Success")
-                                            notificationsScheduler.scheduleNotifications(memo)
-                                            modalShow = true
-                                        },
-                                        onError = {
-                                            Log.e("MEMO_PERSIST", "Unable to persist memo: $it")
-                                        },
-                                        onSessionNotFound = {
-                                            Log.d("MEMO_PERSIST", "Session not found")
-                                        }
-                                    )
+                                    lifecycleScope.persist(memo = memo, onSuccess = {
+                                        Log.d("MEMO_PERSIST", "Success")
+                                        notificationsScheduler.scheduleNotifications(memo)
+                                        modalShow = true
+                                    }, onError = {
+                                        Log.e("MEMO_PERSIST", "Unable to persist memo: $it")
+                                    }, onSessionNotFound = {
+                                        Log.d("MEMO_PERSIST", "Session not found")
+                                    })
                                 }
                             }
 
@@ -237,15 +230,14 @@ class NewMemoActivity : ComponentActivity() {
         memo: Memo,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit,
-        onSessionNotFound: () -> Unit
-    ) =
-        launch {
-            memoManager.saveMemo(
-                memo = memo,
-                onSuccess = onSuccess,
-                onError = onError,
-                onSessionNotFound = onSessionNotFound
-            )
-        }
+        onSessionNotFound: () -> Unit,
+    ) = launch {
+        memoManager.saveMemo(
+            memo = memo,
+            onSuccess = onSuccess,
+            onError = onError,
+            onSessionNotFound = onSessionNotFound
+        )
+    }
 
 }

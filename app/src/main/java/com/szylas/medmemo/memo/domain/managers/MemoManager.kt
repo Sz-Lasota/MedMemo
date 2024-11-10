@@ -9,14 +9,14 @@ import com.szylas.medmemo.memo.datastore.IMemoRepository
 import com.szylas.medmemo.memo.domain.extensions.updateEndless
 
 class MemoManager(
-    private val saver: IMemoRepository
+    private val saver: IMemoRepository,
 ) {
 
     suspend fun saveMemo(
         memo: Memo,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit,
-        onSessionNotFound: () -> Unit
+        onSessionNotFound: () -> Unit,
     ) {
         val user = Session.user()
         if (user == null) {
@@ -31,7 +31,7 @@ class MemoManager(
         memo: Memo,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit,
-        onSessionNotFound: () -> Unit
+        onSessionNotFound: () -> Unit,
     ) {
         val user = Session.user()
         if (user == null) {
@@ -47,7 +47,7 @@ class MemoManager(
         notification: MemoNotification,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit,
-        onSessionNotFound: (String) -> Unit
+        onSessionNotFound: (String) -> Unit,
     ) {
         val user = Session.user()
         if (user == null) {
@@ -55,13 +55,19 @@ class MemoManager(
             return
         }
 
-        saver.updateNotification(memo = memo, notification = notification, user = user, onSuccess = onSuccess, onError = onError)
+        saver.updateNotification(
+            memo = memo,
+            notification = notification,
+            user = user,
+            onSuccess = onSuccess,
+            onError = onError
+        )
     }
 
     suspend fun loadActive(
         onSuccess: (List<Memo>) -> Unit,
         onError: (String) -> Unit,
-        onSessionNotFound: () -> Unit
+        onSessionNotFound: () -> Unit,
     ) {
         val user = Session.user()
         if (user == null) {
@@ -74,7 +80,7 @@ class MemoManager(
     suspend fun updateEndless(
         onSuccess: (Map<Memo, List<MemoNotification>>) -> Unit,
         onError: (String) -> Unit,
-        onSessionNotFound: () -> Unit
+        onSessionNotFound: () -> Unit,
     ) {
         val user = Session.user()
         if (user == null) {
@@ -92,6 +98,13 @@ class MemoManager(
         }
 
         onSuccess(newNotifications)
+    }
+
+    suspend fun fetchMemo(
+        memo: Memo,
+    ): Memo? {
+        val user = Session.user() ?: return null
+        return saver.fetchMemo(user, memo)
     }
 
 

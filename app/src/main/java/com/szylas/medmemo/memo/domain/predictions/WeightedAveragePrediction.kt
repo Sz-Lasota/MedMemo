@@ -7,7 +7,7 @@ import java.util.Calendar
 class WeightedAveragePrediction : IPrediction {
     override fun predict(
         predictionNotification: MemoNotification,
-        previousData: List<MemoNotification>
+        previousData: List<MemoNotification>,
     ): Int {
         Log.d("Rescheduling", "Rescheduling memo: ${predictionNotification.name}")
         // It there is not enough data, default value is returned
@@ -16,13 +16,23 @@ class WeightedAveragePrediction : IPrediction {
         }
 
         val lookUpDate = predictionNotification.date.get(Calendar.DAY_OF_WEEK)
-        val newTime = previousData
+
+        val previousHours = previousData
             .mapNotNull { it.intakeTime }
             .filter { it.get(Calendar.DAY_OF_WEEK) == lookUpDate }
-            .map { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
-            .average()
-            .toInt()
+            .associateWith { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
 
-        return newTime
+        val recent = previousHours.keys
+            .map { it.timeInMillis }
+            .sorted()
+            .takeLast(3)
+
+        val numerator = previousHours
+            .entries
+            .sumOf { (k, v) -> if (recent.contains(k.timeInMillis)) v * 3 else v }
+
+        val denominator = 3 * recent.size + (previousHours.size - recent.size)
+
+        return numerator / denominator
     }
 }

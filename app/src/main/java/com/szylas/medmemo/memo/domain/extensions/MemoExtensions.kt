@@ -61,74 +61,35 @@ fun Memo.updateEndless(): MutableList<MemoNotification> {
 
 fun Memo.generateNotifications() {
     // TODO: Rework id provider
-    val idBase = (Calendar.getInstance().timeInMillis % 100_000).toInt()
+    val idBase = (Calendar.getInstance().timeInMillis % 1_000_000).toInt()
     var idOffset = 0
+
     dosageTime.forEach { hour ->
-        val date = Calendar.getInstance().apply {
+        // Set date to first day of therapy
+        val startDate = Calendar.getInstance().apply { timeInMillis = startDate.timeInMillis }
+        val now = Calendar.getInstance()
+
+        val notifyDate = Calendar.getInstance().apply {
             timeInMillis = startDate.timeInMillis
+            set(Calendar.HOUR_OF_DAY, hour / 60)
+            set(Calendar.MINUTE, hour % 60)
         }
 
-        val now = Calendar.getInstance()
-        if (finishDate != null) {
-            while (!date.after(finishDate)) {
-                val notifyDate = Calendar.getInstance().apply {
-                    timeInMillis = date.timeInMillis
-                    set(Calendar.HOUR_OF_DAY, hour / 60)
-                    set(Calendar.MINUTE, hour % 60)
-                }
-                if (notifyDate.before(now)) {
-                    date.add(Calendar.DATE, 1)
-                    idOffset++
-                    continue
-                }
-                notifications.add(
-                    MemoNotification(
-                        date = notifyDate,
-                        baseDosageTime = hour,
-                        name = name,
-                        notificationId = idBase + idOffset
-                    )
-                )
-                date.add(Calendar.DATE, 1)
-                idOffset++
-            }
-            notifications.add(
-                MemoNotification(
-                    date = Calendar.getInstance().apply {
-                        timeInMillis = date.timeInMillis
-                        set(Calendar.HOUR_OF_DAY, hour / 60)
-                        set(Calendar.MINUTE, hour % 60)
-                    },
-                    baseDosageTime = hour,
-                    name = name,
-                    notificationId = idBase + idOffset
-                )
-            )
-            idOffset++
-        } else {
-            for (i in 1..91) {
-                val notifyDate = Calendar.getInstance().apply {
-                    timeInMillis = date.timeInMillis
-                    set(Calendar.HOUR_OF_DAY, hour / 60)
-                    set(Calendar.MINUTE, hour % 60)
-                }
-                if (notifyDate.before(now)) {
-                    date.add(Calendar.DATE, 1)
-                    idOffset++
-                    continue
-                }
-                notifications.add(
-                    MemoNotification(
-                        date = notifyDate,
-                        baseDosageTime = hour,
-                        name = name,
-                        notificationId = idBase + idOffset
-                    )
-                )
-                date.add(Calendar.DATE, 1)
-                idOffset++
-            }
+        // if notify date is before now, set notification to following day
+        if (notifyDate.before(now)) {
+            notifyDate.add(Calendar.DATE, 1)
         }
+
+        notifications.add(
+            MemoNotification(
+                date = notifyDate,
+                baseDosageTime = hour,
+                name = name,
+                notificationId = idBase + idOffset
+            )
+        )
+
+        idOffset++
     }
 }
 

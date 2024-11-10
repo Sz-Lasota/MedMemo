@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.gesture.Prediction
 import android.util.Log
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.domain.models.MemoNotification
@@ -44,17 +43,16 @@ class NotificationsScheduler(private val context: Context) {
         onError: (String) -> Unit,
         onSessionNotFound: (String) -> Unit,
     ) {
-        val pendingNotification = memo.notifications
-            .filter { it.baseDosageTime == lastNotification.baseDosageTime }
-            .filter { it.date.after(lastNotification.date) }
-            .filter { it.notificationId != lastNotification.notificationId }
-            .minBy { it.date }
+        val pendingNotification =
+            memo.notifications.filter { it.baseDosageTime == lastNotification.baseDosageTime }
+                .filter { it.date.after(lastNotification.date) }
+                .filter { it.notificationId != lastNotification.notificationId }.minBy { it.date }
 
         Log.e("Rescheduling", "Notification to reschedule: $pendingNotification")
         cancelAlarm(memo, pendingNotification)
-        val previousData = memo.notifications
-            .filter { it.baseDosageTime == lastNotification.baseDosageTime }
-            .filter { it.intakeTime != null }
+        val previousData =
+            memo.notifications.filter { it.baseDosageTime == lastNotification.baseDosageTime }
+                .filter { it.intakeTime != null }
         val newDate = prediction.predict(pendingNotification, previousData)
 
         pendingNotification.date.apply {
@@ -64,11 +62,7 @@ class NotificationsScheduler(private val context: Context) {
 
         scheduleAlarm(memo, pendingNotification)
         memoManager.updateMemo(
-            memo,
-            lastNotification,
-            onSuccess,
-            onError,
-            onSessionNotFound
+            memo, lastNotification, onSuccess, onError, onSessionNotFound
         )
 
     }
@@ -112,9 +106,7 @@ class NotificationsScheduler(private val context: Context) {
         val alarm = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         alarm.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            memoNotification.date.timeInMillis,
-            pendingIntent
+            AlarmManager.RTC_WAKEUP, memoNotification.date.timeInMillis, pendingIntent
         )
     }
 
@@ -140,6 +132,46 @@ class NotificationsScheduler(private val context: Context) {
     fun scheduleNotification(memo: Memo, notification: MemoNotification) {
         Log.i("MEMO_ADD_NOTIFICATION", "Memo name: ${memo.name}, time: ${notification.date}")
         scheduleAlarm(memo, notification)
+    }
+
+    suspend fun scheduleNextNotification(memo: Memo, memoNotification: MemoNotification, prediction: IPrediction) {
+        val updatedMemo = memoManager.fetchMemo(
+            memo = memo,
+        ) ?: return
+
+        val tomorrow = Calendar.getInstance().apply { add(Calendar.DATE, 1) }
+        if (updatedMemo.finishDate != null && tomorrow.after(updatedMemo.finishDate)) {
+            return
+        }
+
+        tomorrow.set(Calendar.HOUR_OF_DAY, memoNotification.baseDosageTime / 60)
+        tomorrow.set(Calendar.MINUTE, memoNotification.baseDosageTime % 60)
+
+        val newNotification = MemoNotification(
+            date = tomorrow,
+            baseDosageTime = memoNotification.baseDosageTime,
+            name = memoNotification.name,
+            notificationId = memoNotification.notificationId
+        )
+        // TODO: Calculate new time here
+        if (updatedMemo.smartMode) {
+            val newTime = prediction.predict(
+                newNotification,
+                updatedMemo.notifications
+            )
+            tomorrow.set(Calendar.HOUR_OF_DAY, newTime / 60)
+            tomorrow.set(Calendar.MINUTE, newTime % 60)
+        }
+
+        updatedMemo.notifications.add(newNotification)
+        scheduleAlarm(updatedMemo, newNotification)
+
+        memoManager.saveMemo(
+            updatedMemo,
+            onSuccess = { Log.d("PERSIST", "Successfully persisted memo") },
+            onError = { Log.e("PERSIST", it) },
+            onSessionNotFound = { Log.e("PERSIST", "Session not found!") }
+        )
     }
 
 

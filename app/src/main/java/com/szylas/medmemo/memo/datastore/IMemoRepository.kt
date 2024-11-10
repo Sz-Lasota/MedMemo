@@ -9,21 +9,21 @@ interface IMemoRepository {
         memo: Memo,
         user: String,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     )
 
     suspend fun deleteMemo(
         memo: Memo,
         user: String,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     )
 
     suspend fun updateMemo(
         memo: Memo,
         user: String,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     )
 
     suspend fun updateNotification(
@@ -31,11 +31,12 @@ interface IMemoRepository {
         notification: MemoNotification,
         user: String,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     )
 
     suspend fun loadActive(user: String, onSuccess: (List<Memo>) -> Unit, onError: (String) -> Unit)
 
     suspend fun loadActiveAndEndless(user: String, onError: (String) -> Unit): List<Memo>
+    suspend fun fetchMemo(user: String, memo: Memo): Memo?
 
 }
