@@ -9,7 +9,6 @@ class WeightedAveragePrediction : IPrediction {
         predictionNotification: MemoNotification,
         previousData: List<MemoNotification>,
     ): Int {
-        Log.d("Rescheduling", "Rescheduling memo: ${predictionNotification.name}")
         // It there is not enough data, default value is returned
         if (previousData.size < 7) {
             return predictionNotification.baseDosageTime
@@ -21,6 +20,10 @@ class WeightedAveragePrediction : IPrediction {
             .mapNotNull { it.intakeTime }
             .filter { it.get(Calendar.DAY_OF_WEEK) == lookUpDate }
             .associateWith { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
+
+        if (previousHours.isEmpty()) {
+            return predictionNotification.baseDosageTime
+        }
 
         val recent = previousHours.keys
             .map { it.timeInMillis }

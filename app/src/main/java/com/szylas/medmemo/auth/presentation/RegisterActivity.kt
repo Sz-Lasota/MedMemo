@@ -91,20 +91,20 @@ class RegisterActivity : ComponentActivity() {
                             ),
                             horizontalAlignment = Alignment.Start
                         ) {
-                            AppLogo(
-                                modifier = Modifier.fillMaxWidth(),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
+//                            AppLogo(
+//                                modifier = Modifier.fillMaxWidth(),
+//                                color = MaterialTheme.colorScheme.onSurface
+//                            )
                             Text(
                                 text = "Create new account", style = TextStyleProvider.provide(
                                     style = TextStyleOption.TITLE_LARGE
                                 )
                             )
-                            Spacer(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f)
-                            )
+//                            Spacer(
+//                                modifier = Modifier
+//                                    .fillMaxWidth()
+//                                    .weight(1f)
+//                            )
                             Inputs()
                             Spacer(
                                 modifier = Modifier

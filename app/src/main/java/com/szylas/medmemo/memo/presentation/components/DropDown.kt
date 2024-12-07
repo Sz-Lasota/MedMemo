@@ -78,7 +78,7 @@ fun DropDownMenu(suggestions: List<String>, label: String, onValueChange: (Strin
 private fun prepLabel(label: String): String {
     val parts = label.split("_")
     val date = Calendar.getInstance().apply {
-        timeInMillis = parts[1].toLong()
+        timeInMillis = parts.last().toLong()
     }
 
     return "${parts[0]} from ${formatDate(date)}"

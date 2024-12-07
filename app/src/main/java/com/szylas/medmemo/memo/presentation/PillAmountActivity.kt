@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -83,45 +84,30 @@ class PillAmountActivity : ComponentActivity() {
                 mutableStateOf(false)
             }
 
-            lifecycleScope.cleanup(
-                onSuccess = {
-                    lifecycleScope.fetchAll(
-                        onSuccess = {
-                            fetched = true
-                        },
-                        onError = {
-                            Toast.makeText(this, "Unable to fetch from server", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    )
-                },
-                onError = {
-                    Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
-                }
-            )
+            lifecycleScope.cleanup(onSuccess = {
+                lifecycleScope.fetchAll(onSuccess = {
+                    fetched = true
+                }, onError = {
+                    Toast.makeText(this, "Unable to fetch from server", Toast.LENGTH_SHORT).show()
+                })
+            }, onError = {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            })
             MedMemoTheme {
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    floatingActionButton = {
-                        FloatingActionButton(onClick = { isDialogOpen = true }) {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-                        }
+                Scaffold(modifier = Modifier.fillMaxSize(), floatingActionButton = {
+                    FloatingActionButton(onClick = { isDialogOpen = true }) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                     }
-                ) { innerPadding ->
+                }) { innerPadding ->
                     Box(
                         modifier = Modifier
-                            .paint(
-                                imageBackground(),
-                                contentScale = ContentScale.FillBounds
-                            )
+                            .background(MaterialTheme.colorScheme.primaryContainer)
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) {
                         if (!fetched) {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxSize(),
+                                modifier = Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
@@ -130,8 +116,8 @@ class PillAmountActivity : ComponentActivity() {
                                 )
                             }
                         } else {
-                            LazyPillAmount(
-                                setFetch = { fetched = it },
+                            LazyPillAmount(setFetch = { fetched = it },
+                                openDialog = { isDialogOpen = true },
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(10.dp)
@@ -139,36 +125,27 @@ class PillAmountActivity : ComponentActivity() {
                         }
                         if (isDialogOpen) {
                             NewPillAmountDialog(onDismiss = { isDialogOpen = false }) {
-                                lifecycleScope.update(
-                                    count = it,
-                                    onSuccess = {
-                                        fetched = false
-                                        lifecycleScope.fetchAll(
-                                            onSuccess = {
-                                                fetched = true
-                                            },
-                                            onError = {
-                                                Toast.makeText(
-                                                    this@PillAmountActivity,
-                                                    "Unable to fetch from server",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                    .show()
-                                            }
-                                        )
+                                lifecycleScope.update(count = it, onSuccess = {
+                                    fetched = false
+                                    lifecycleScope.fetchAll(onSuccess = {
+                                        fetched = true
+                                    }, onError = {
                                         Toast.makeText(
                                             this@PillAmountActivity,
-                                            "Successfully created med count",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    },
-                                    onError = {
-                                        Toast.makeText(
-                                            this@PillAmountActivity,
-                                            it,
+                                            "Unable to fetch from server",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     })
+                                    Toast.makeText(
+                                        this@PillAmountActivity,
+                                        "Successfully created med count",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }, onError = {
+                                    Toast.makeText(
+                                        this@PillAmountActivity, it, Toast.LENGTH_SHORT
+                                    ).show()
+                                })
                                 isDialogOpen = false
                             }
                         }
@@ -180,11 +157,27 @@ class PillAmountActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun LazyPillAmount(setFetch: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+    private fun LazyPillAmount(
+        setFetch: (Boolean) -> Unit,
+        openDialog: () -> Unit,
+        modifier: Modifier = Modifier,
+    ) {
         LazyColumn(
-            modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            item {
+                Button(
+                    onClick = openDialog,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(5.dp, RoundedCornerShape(14.dp))
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(MaterialTheme.colorScheme.onSecondary)
+                        .padding(10.dp)
+                ) {
+                    Text(stringResource(R.string.add_new))
+                }
+            }
             items(pillManager.counts) {
                 PillAmountItem(
                     pillCount = it,
@@ -192,7 +185,7 @@ class PillAmountActivity : ComponentActivity() {
                         .fillMaxWidth()
                         .shadow(5.dp, RoundedCornerShape(14.dp))
                         .clip(RoundedCornerShape(14.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .background(MaterialTheme.colorScheme.onSecondary)
                         .padding(10.dp),
                     setFetch = setFetch
                 )
@@ -225,16 +218,13 @@ class PillAmountActivity : ComponentActivity() {
             modifier = modifier
         ) {
             Text(text = pillCount.name(), style = MaterialTheme.typography.headlineMedium)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(MaterialTheme.colorScheme.surface)
-                    .clickable { isDialogOpen = true }
-            ) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(24.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .clickable { isDialogOpen = true }) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     if (pillCount.count != pillCount.maxAmount && pillCount.count != 0) {
                         Row(
@@ -279,47 +269,36 @@ class PillAmountActivity : ComponentActivity() {
         }
 
         if (isDialogOpen) {
-            RefillDialog(
-                initCount = pillCount.count,
-                onConfirm = {
-                    pillCount.count = it
-                    pillCount.maxAmount = it
-                    lifecycleScope.update(
-                        count = pillCount,
-                        onSuccess = {
-                            setFetch(false)
-                            lifecycleScope.fetchAll(
-                                onSuccess = {
-                                    setFetch(true)
-                                },
-                                onError = {
-                                    Toast.makeText(
-                                        this@PillAmountActivity,
-                                        "Unable to fetch from server",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                        .show()
-                                }
-                            )
-                            Toast.makeText(
-                                this@PillAmountActivity,
-                                "Successfully created med count",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
-                        onError = {
-                            Toast.makeText(
-                                this@PillAmountActivity,
-                                "Successfully created med count",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    )
-                    isDialogOpen = false
-                },
-                onDismiss = {
-                    isDialogOpen = false
+            RefillDialog(initCount = pillCount.count, onConfirm = {
+                pillCount.count = it
+                pillCount.maxAmount = it
+                lifecycleScope.update(count = pillCount, onSuccess = {
+                    setFetch(false)
+                    lifecycleScope.fetchAll(onSuccess = {
+                        setFetch(true)
+                    }, onError = {
+                        Toast.makeText(
+                            this@PillAmountActivity,
+                            "Unable to fetch from server",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    })
+                    Toast.makeText(
+                        this@PillAmountActivity,
+                        "Successfully created med count",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }, onError = {
+                    Toast.makeText(
+                        this@PillAmountActivity,
+                        "Successfully created med count",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 })
+                isDialogOpen = false
+            }, onDismiss = {
+                isDialogOpen = false
+            })
         }
     }
 
@@ -345,8 +324,7 @@ class PillAmountActivity : ComponentActivity() {
                     text = stringResource(R.string.enter_new_amount_of_pills),
                     style = MaterialTheme.typography.headlineLarge
                 )
-                TextInput(
-                    value = "$count",
+                TextInput(value = "$count",
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     label = stringResource(R.string.pills_amount),
                     onValueChange = {
@@ -358,12 +336,9 @@ class PillAmountActivity : ComponentActivity() {
                             return@TextInput
                         }
                         count = it
-                    }
-                )
+                    })
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
                         Text(text = stringResource(id = R.string.cancel))
@@ -402,8 +377,7 @@ class PillAmountActivity : ComponentActivity() {
                     style = MaterialTheme.typography.titleLarge
                 )
 
-                DropDownMenu(
-                    suggestions = pillManager.active,
+                DropDownMenu(suggestions = pillManager.active,
                     label = stringResource(R.string.therapy),
                     modifier = Modifier,
                     onValueChange = {
@@ -413,8 +387,7 @@ class PillAmountActivity : ComponentActivity() {
                     text = stringResource(R.string.enter_amount_of_pills),
                     style = MaterialTheme.typography.titleLarge
                 )
-                TextInput(
-                    value = "$amount",
+                TextInput(value = "$amount",
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     label = stringResource(R.string.pills_amount),
                     onValueChange = {
@@ -426,13 +399,10 @@ class PillAmountActivity : ComponentActivity() {
                             return@TextInput
                         }
                         amount = it
-                    }
-                )
+                    })
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
                         Text(text = stringResource(id = R.string.cancel))

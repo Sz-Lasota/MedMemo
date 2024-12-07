@@ -112,10 +112,10 @@ class LoginActivity : ComponentActivity() {
                             horizontalAlignment = Alignment.Start
                         ) {
                             Headers()
-                            Spacer(
-                                modifier = Modifier
-                                    .weight(2f)
-                            )
+//                            Spacer(
+//                                modifier = Modifier
+//                                    .weight(1f)
+//                            )
                             Inputs()
                             Spacer(
                                 modifier = Modifier
@@ -157,9 +157,7 @@ class LoginActivity : ComponentActivity() {
             )
             Text(
                 text = stringResource(R.string.don_t_have_account),
-                style = TextStyleProvider.provide(
-                    TextStyleOption.LABEL_MEDIUM
-                ),
+                style = MaterialTheme.typography.titleSmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -175,7 +173,7 @@ class LoginActivity : ComponentActivity() {
     private fun Inputs() {
         Column(
             modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(
-                40.dp, Alignment.Bottom
+                20.dp, Alignment.Bottom
             )
         ) {
             TextInput(
@@ -209,13 +207,11 @@ class LoginActivity : ComponentActivity() {
 
             Text(
                 text = stringResource(R.string.welcome),
-                style = TextStyleProvider.provide(TextStyleOption.TITLE_LARGE)
+                style = MaterialTheme.typography.headlineMedium
             )
             Text(
                 text = stringResource(R.string.please_sign_in_to_continue),
-                style = TextStyleProvider.provide(
-                    TextStyleOption.LABEL_MEDIUM
-                )
+                style = MaterialTheme.typography.titleLarge
             )
         }
     }

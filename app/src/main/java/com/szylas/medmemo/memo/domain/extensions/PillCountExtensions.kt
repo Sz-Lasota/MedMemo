@@ -6,11 +6,11 @@ import com.szylas.medmemo.memo.datastore.models.PillCount
 fun PillCount.color(): Color {
     val ratio = count / maxAmount.toDouble()
     return if (ratio > 0.45) {
-        Color(0xff39CB36)
+        Color(0xFF2F842E)
     } else if (ratio > 0.25) {
-        Color(0xFFFFB31B)
+        Color(0xFFC89222)
     } else {
-        Color(0xffCB3636)
+        Color(0xFFB13434)
     }
 }
 

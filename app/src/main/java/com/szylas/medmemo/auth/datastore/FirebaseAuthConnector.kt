@@ -12,7 +12,7 @@ class FirebaseAuthConnector : IAuthConnector {
     override suspend fun login(
         credentials: LoginCredentials,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     ) {
         FirebaseAuth.getInstance()
             .signInWithEmailAndPassword(credentials.eMail, credentials.password)
@@ -31,7 +31,7 @@ class FirebaseAuthConnector : IAuthConnector {
     override suspend fun register(
         credentials: RegisterCredentials,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     ) {
         FirebaseAuth.getInstance()
             .createUserWithEmailAndPassword(credentials.eMail, credentials.password)
@@ -58,5 +58,29 @@ class FirebaseAuthConnector : IAuthConnector {
             onSuccess = onSuccess,
             onError = { Log.e("Restore session", "Could not restore session: $it") })
 
+    }
+
+    override suspend fun changeEmail(
+        email: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        val firebaseUser = FirebaseAuth.getInstance().currentUser ?: return
+        firebaseUser.verifyBeforeUpdateEmail(email).addOnSuccessListener { onSuccess("Updated") }
+            .addOnFailureListener {
+                onError(it.message ?: "Unknown error when creating user!")
+            }
+    }
+
+    override suspend fun changePassword(
+        password: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        val firebaseUser = FirebaseAuth.getInstance().currentUser ?: return
+        firebaseUser.updatePassword(password).addOnSuccessListener { onSuccess("Updated") }
+            .addOnFailureListener {
+                onError(it.message ?: "Unknown error when creating user!")
+            }
     }
 }

@@ -9,6 +9,10 @@ class FirebaseSessionStore: ISessionStore {
         return firebase.currentUser?.uid
     }
 
+    override fun getEmail(): String? {
+        return firebase.currentUser?.email
+    }
+
     override fun signOut() {
         firebase.signOut()
     }

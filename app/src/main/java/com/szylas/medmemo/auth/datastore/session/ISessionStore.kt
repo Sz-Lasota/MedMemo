@@ -4,5 +4,7 @@ interface ISessionStore {
 
     fun getUsername(): String?
 
+    fun getEmail(): String?
+
     fun signOut()
 }

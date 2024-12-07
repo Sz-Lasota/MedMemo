@@ -10,7 +10,7 @@ import com.szylas.medmemo.auth.domain.validation.validateRepeatedPassword
 import kotlinx.coroutines.Dispatchers
 
 class AuthManager(
-    private val connector: IAuthConnector
+    private val connector: IAuthConnector,
 ) {
 
     val user: String? = Session.user()
@@ -18,7 +18,7 @@ class AuthManager(
     suspend fun login(
         credentials: LoginCredentials,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     ) = with(Dispatchers.IO) {
         if (!validateEmail(credentials.eMail)) {
             onError("Invalid email!")
@@ -28,10 +28,25 @@ class AuthManager(
         connector.login(credentials, onSuccess, onError)
     }
 
+    suspend fun changeEmail(
+        newEmail: String, onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        connector.changeEmail(newEmail, onSuccess, onError)
+    }
+
+    suspend fun changePassword(
+        newPassword: String, onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        connector.changePassword(newPassword, onSuccess, onError)
+    }
+
+
     suspend fun register(
         credentials: RegisterCredentials,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     ) = with(Dispatchers.IO) {
         if (credentials.name.isBlank()) {
             onError("Name field cannot be empty!")
@@ -53,7 +68,7 @@ class AuthManager(
         connector.register(credentials, onSuccess, onError)
     }
 
-    suspend fun checkForSession(onSuccess: (String) -> Unit ) {
+    suspend fun checkForSession(onSuccess: (String) -> Unit) {
         connector.checkForSession(onSuccess)
     }
 

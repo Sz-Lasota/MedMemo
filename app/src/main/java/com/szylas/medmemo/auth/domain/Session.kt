@@ -10,6 +10,10 @@ object Session {
         return defaultStore.getUsername()
     }
 
+    fun email(): String? {
+        return defaultStore.getEmail()
+    }
+
     fun signOut() {
         defaultStore.signOut()
     }

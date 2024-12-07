@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,6 +53,7 @@ fun MemoDateFragment(
     activity: ComponentActivity,
     statusBarManager: StatusBarManager,
     memo: Memo,
+    onBackNav: () -> Unit,
     navigation: () -> Unit,
 ) {
 
@@ -113,12 +115,6 @@ fun MemoDateFragment(
                 contentDescription = stringResource(R.string.name_tooltip)
             )
         }
-        Button(
-            onClick = { startShowDatePicker = true },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(id = R.string.choose))
-        }
 
         Text(
             modifier = Modifier.fillMaxWidth(),
@@ -127,6 +123,13 @@ fun MemoDateFragment(
             style = MaterialTheme.typography.titleSmall,
             softWrap = true
         )
+        Button(
+            onClick = { startShowDatePicker = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(id = R.string.choose))
+        }
+
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -155,13 +158,6 @@ fun MemoDateFragment(
             })
         }
 
-        Button(
-            onClick = { finishShowDatePicker = true },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !endless
-        ) {
-            Text(stringResource(id = R.string.choose))
-        }
 
 
         Text(
@@ -173,27 +169,52 @@ fun MemoDateFragment(
         )
 
 
+        Button(
+            onClick = { finishShowDatePicker = true },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !endless
+        ) {
+            Text(stringResource(id = R.string.choose))
+        }
+
+
         Spacer(modifier = Modifier.weight(1f))
         statusBarManager.StatusBar()
         Spacer(modifier = Modifier.weight(0.2f))
-        Button(
-            onClick = {
 
-                if (!endless && memo.finishDate == null) {
-                    Toast.makeText(
-                        activity,
-                        activity.getString(R.string.therapy_is_marked_not_endless_but_no_finish_date_is_provided),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return@Button
-                }
-
-                navigation()
-            },
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-            Text(stringResource(id = R.string.next))
+            Button(
+                onClick = { onBackNav() },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                )
+            ) { Text("Back") }
+
+            Button(
+                onClick = {
+
+                    if (!endless && memo.finishDate == null) {
+                        Toast.makeText(
+                            activity,
+                            activity.getString(R.string.therapy_is_marked_not_endless_but_no_finish_date_is_provided),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
+
+                    navigation()
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(stringResource(id = R.string.next))
+            }
         }
+
 
         if (isStartTooltip) {
             TooltipModal(title = stringResource(id = R.string.start_date), body = stringResource(R.string.start_tooltip)) {

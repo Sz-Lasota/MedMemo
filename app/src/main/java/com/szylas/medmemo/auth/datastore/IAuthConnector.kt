@@ -8,14 +8,25 @@ interface IAuthConnector {
     suspend fun login(
         credentials: LoginCredentials,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     )
 
     suspend fun register(
         credentials: RegisterCredentials,
         onSuccess: (String) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
     )
 
     suspend fun checkForSession(onSuccess: (String) -> Unit)
+    suspend fun changeEmail(
+        email: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+    )
+
+    suspend fun changePassword(
+        password: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+    )
 }

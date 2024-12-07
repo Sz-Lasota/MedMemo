@@ -5,7 +5,7 @@ import java.util.Calendar
 
 data class Memo(
     var name: String = "",
-    var numberOfDoses: Int = 0,
+    var numberOfDoses: Int = 1,
     var smartMode: Boolean = false,
     var dosageTime: List<Int> = listOf(),
     var startDate: Calendar = Calendar.getInstance(),

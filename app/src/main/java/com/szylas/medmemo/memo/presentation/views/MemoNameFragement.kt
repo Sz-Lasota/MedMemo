@@ -13,14 +13,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import com.szylas.medmemo.R
@@ -36,6 +42,7 @@ import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.presentation.components.TextInput
 import com.szylas.medmemo.memo.presentation.components.StatusBarManager
 import com.szylas.medmemo.memo.presentation.components.TooltipModal
+import java.util.Calendar
 
 @Composable
 fun MemoNameFragment(
@@ -56,6 +63,8 @@ fun MemoNameFragment(
     }
 
 
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -66,15 +75,11 @@ fun MemoNameFragment(
             mutableStateOf(memo.name)
         }
         var numberOfDoses by remember {
-            mutableStateOf("")
+            mutableStateOf(1)
         }
 
-        var gapHour by remember {
-            mutableStateOf("")
-        }
-        var gapMinute by remember {
-            mutableStateOf("")
-        }
+        var gap by remember { mutableFloatStateOf(1f) }
+
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -127,17 +132,50 @@ fun MemoNameFragment(
                 contentDescription = stringResource(R.string.name_tooltip)
             )
         }
-        TextInput(modifier = Modifier.fillMaxWidth(),
-            value = numberOfDoses,
-            label = stringResource(id = R.string.number_of_doses),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            onValueChange = {
-                if (!it.isDigitsOnly()) {
-                    return@TextInput
-                }
-                numberOfDoses = it
-                memo.numberOfDoses = it.toIntOrNull() ?: 0
-            })
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+            IconButton(
+                onClick = {
+                    if (numberOfDoses == 1) {
+                        return@IconButton
+                    }
+                    numberOfDoses--
+                    memo.numberOfDoses = numberOfDoses
+                },
+                enabled = numberOfDoses > 1
+
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = "Left"
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = memo.numberOfDoses.toString(), style = MaterialTheme.typography.titleLarge
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(
+                onClick = {
+                    if (numberOfDoses >= 20) {
+                        return@IconButton
+                    }
+                    numberOfDoses++
+                    memo.numberOfDoses = numberOfDoses
+                },
+                enabled = numberOfDoses < 20
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "Right"
+                )
+            }
+
+
+        }
+
         Row(
             verticalAlignment = Alignment.CenterVertically
 
@@ -154,46 +192,22 @@ fun MemoNameFragment(
                 contentDescription = stringResource(R.string.name_tooltip)
             )
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)
-        ) {
-            TextInput(
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                value = gapHour,
-                label = stringResource(R.string.hours),
-                onValueChange = {
-                    if ((it.toIntOrNull() ?: 0) >= 24) {
-                        return@TextInput
-                    }
-                    if (!it.isDigitsOnly()) {
-                        return@TextInput
-                    }
-                    gapHour = it
-                    memo.gap = (it.toIntOrNull() ?: 0) * 60 + (gapMinute.toIntOrNull() ?: 0)
-                },
-                modifier = Modifier.weight(1f)
-            )
-            TextInput(
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                value = gapMinute,
-                label = stringResource(R.string.minutes),
-                onValueChange = {
-                    if ((it.toIntOrNull() ?: 0) >= 60) {
-                        return@TextInput
-                    }
-                    if (!it.isDigitsOnly()) {
-                        return@TextInput
-                    }
-                    gapMinute = it
-                    memo.gap = (it.toIntOrNull() ?: 0) + (gapHour.toIntOrNull() ?: 0) * 60
-                },
-                modifier = Modifier.weight(1f)
-            )
-
-
-        }
+        Slider(
+            gap,
+            onValueChange = {
+                gap = it
+                memo.gap = it.toInt() * 60
+            },
+            modifier = Modifier.fillMaxWidth().padding(5.dp),
+            enabled = memo.numberOfDoses > 1,
+            valueRange = 1f..12f,
+            steps = 12
+        )
+        Text(
+            text = gap.toInt().toString(),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
 
         Spacer(modifier = Modifier.weight(1f))
         statusBarManager.StatusBar()
@@ -209,27 +223,15 @@ fun MemoNameFragment(
                     return@Button
                 }
 
-                if (numberOfDoses.isBlank() || memo.numberOfDoses < 1) {
-                    Toast.makeText(
-                        activity,
-                        activity.getString(R.string.there_must_be_at_least_one_dose),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return@Button
-                }
-
                 if (memo.gap * (memo.numberOfDoses - 1) > 23 * 60 + 59) {
                     Toast.makeText(
-                        activity,
-                        activity.getString(R.string.cannot_schedule),
-                        Toast.LENGTH_SHORT
+                        activity, activity.getString(R.string.cannot_schedule), Toast.LENGTH_SHORT
                     ).show()
                     return@Button
                 }
 
                 navigation()
-            },
-            modifier = Modifier.fillMaxWidth()
+            }, modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = stringResource(id = R.string.next))
         }
@@ -253,7 +255,10 @@ fun MemoNameFragment(
         }
 
         if (isGapTooltip) {
-            TooltipModal(title = stringResource(R.string.gap_between_doses), body = stringResource(R.string.gap_tooltip)) {
+            TooltipModal(
+                title = stringResource(R.string.gap_between_doses),
+                body = stringResource(R.string.gap_tooltip)
+            ) {
                 isGapTooltip = false
             }
         }

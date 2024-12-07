@@ -141,30 +141,39 @@ class NewMemoActivity : ComponentActivity() {
                                 MemoNameFragment(
                                     activity = this@NewMemoActivity,
                                     statusBarManager = statusManager,
-                                    memo = memo
+                                    memo = memo,
+
                                 ) {
                                     navController.navigate(MemoTimeScreen)
-                                    statusManager.updateActive(1)
+                                    statusManager.updateActive(2)
                                 }
                             }
                             composable<MemoTimeScreen> {
                                 MemoTimeFragment(
                                     activity = this@NewMemoActivity,
                                     statusBarManager = statusManager,
-                                    memo = memo
+                                    memo = memo,
+                                    onBackNav = {
+                                        navController.navigate(MemoNameScreen)
+                                        statusManager.updateActive(1)
+                                    }
                                 ) {
                                     navController.navigate(MemoDateScreen)
-                                    statusManager.updateActive(2)
+                                    statusManager.updateActive(3)
                                 }
                             }
                             composable<MemoDateScreen> {
                                 MemoDateFragment(
                                     activity = this@NewMemoActivity,
                                     statusBarManager = statusManager,
-                                    memo = memo
+                                    memo = memo,
+                                    onBackNav = {
+                                        navController.navigate(MemoTimeScreen)
+                                        statusManager.updateActive(2)
+                                    }
                                 ) {
                                     navController.navigate(MemoSummaryScreen)
-                                    statusManager.updateActive(3)
+                                    statusManager.updateActive(4)
                                 }
                             }
                             composable<MemoSummaryScreen> {
@@ -172,6 +181,10 @@ class NewMemoActivity : ComponentActivity() {
                                     activity = this@NewMemoActivity,
                                     statusBarManager = statusManager,
                                     memo = memo,
+                                    onBackNav = {
+                                        navController.navigate(MemoDateScreen)
+                                        statusManager.updateActive(3)
+                                    }
                                 ) {
                                     Log.w("MEMO_PERSIST", "Generating")
                                     memo.generateNotifications()

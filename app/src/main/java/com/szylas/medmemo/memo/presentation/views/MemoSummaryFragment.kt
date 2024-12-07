@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -62,6 +63,7 @@ fun MemoSummaryFragment(
     activity: ComponentActivity,
     statusBarManager: StatusBarManager,
     memo: Memo,
+    onBackNav: () -> Unit,
     navigation: () -> Unit,
 ) {
 
@@ -246,32 +248,49 @@ fun MemoSummaryFragment(
         Spacer(modifier = Modifier.weight(1f))
         statusBarManager.StatusBar()
         Spacer(modifier = Modifier.weight(0.2f))
-        Button(
-            onClick = {
-                if (pillCount != null) {
-                    activity.lifecycleScope.update(
-                        pillCount = pillCount!!,
-                        onSuccess = {
-                            Toast.makeText(
-                                activity,
-                                activity.getString(R.string.successfully_add_pill_count),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
-                        onError = {
-                            Toast.makeText(
-                                activity,
-                                it,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        })
-                }
-                navigation()
-            },
-            modifier = Modifier.fillMaxWidth()
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-            Text(text = stringResource(R.string.finish))
+            Button(
+                onClick = { onBackNav() },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                )
+            ) { Text("Back") }
+
+            Button(
+                onClick = {
+                    if (pillCount != null) {
+                        activity.lifecycleScope.update(
+                            pillCount = pillCount!!,
+                            onSuccess = {
+                                Toast.makeText(
+                                    activity,
+                                    activity.getString(R.string.successfully_add_pill_count),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            onError = {
+                                Toast.makeText(
+                                    activity,
+                                    it,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            })
+                    }
+                    navigation()
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = stringResource(R.string.finish))
+            }
         }
+
+
 
         if (isPillCountTooltip) {
             TooltipModal(title = stringResource(id = R.string.pill_counter), body = stringResource(R.string.amount_tooltip)) {
