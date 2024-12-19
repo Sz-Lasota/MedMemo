@@ -10,15 +10,15 @@ import com.szylas.medmemo.statistics.datastore.IMemoRepository
 import java.util.Calendar
 
 class StatisticsManager(
-    private val repository: IMemoRepository,
+    private val repository: IMemoRepository?,
 ) {
 
-    private var memos: List<Memo> = listOf()
+    var memos: List<Memo> = listOf()
 
     suspend fun update(callback: (Boolean) -> Unit) {
         val user = Session.user() ?: throw RuntimeException("Session not found!")
         Log.d("User", user)
-        repository.fetchAll(
+        repository!!.fetchAll(
             user = user,
             onSuccess = {
                 memos = it
@@ -61,13 +61,15 @@ class StatisticsManager(
             .map { it.name }
     }
 
-    fun pillsTime(name: String, startDate: Calendar = Calendar.getInstance()): Pair<List<List<Double>>, List<List<String>>> {
+    fun pillsTime(
+        name: String,
+        startDate: Calendar = Calendar.getInstance(),
+    ): Pair<List<List<Double>>, List<List<String>>> {
         val therapy = memos.firstOrNull { it.name == name }
         if (therapy == null) {
             return Pair(emptyList(), listOf())
         }
 
-        Log.d("Stat_therapy_name", therapy.name)
 
         val notifications = therapy.notifications
             .filter {
@@ -82,9 +84,7 @@ class StatisticsManager(
                     set(Calendar.HOUR_OF_DAY, 1)
                 })
             }
-        notifications.forEach {
-            Log.d("Notification: ${it.name}, ${it.baseDosageTime}", formatFullDate(it.date))
-        }
+
         val hours = notifications.map { it.baseDosageTime }.distinct()
 
         val series: MutableList<List<Double>> = mutableListOf()
@@ -100,9 +100,6 @@ class StatisticsManager(
                             it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE).toDouble()
                     }
             )
-        }
-        series.firstOrNull()?.forEach {
-            Log.d("Element", it.toString())
         }
 
         val xAxis = notifications
@@ -123,20 +120,20 @@ class StatisticsManager(
 
         val currentNotifications = currentMemos
             .flatMap { it.notifications }
-            .filter {it.date.after(Calendar.getInstance().apply {
-                add(Calendar.DATE, -5)
-                set(Calendar.HOUR_OF_DAY, 1)
-            })
-                    && it.date.before(Calendar.getInstance().apply {
-                add(Calendar.DATE, 1)
-                set(Calendar.HOUR_OF_DAY, 1)
-            })}
+            .filter {
+                it.date.after(Calendar.getInstance().apply {
+                    add(Calendar.DATE, -5)
+                    set(Calendar.HOUR_OF_DAY, 1)
+                }) && it.date.before(Calendar.getInstance().apply {
+                    add(Calendar.DATE, 1)
+                    set(Calendar.HOUR_OF_DAY, 1)
+                })
+            }
 
         return Pair(
             currentNotifications.count { it.intakeTime == null }.toDouble(),
             currentNotifications.count { it.intakeTime != null }.toDouble(),
         )
-
     }
 
 

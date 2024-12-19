@@ -90,23 +90,29 @@ class NotificationsScheduler(private val context: Context) {
     }
 
     private fun scheduleAlarm(memo: Memo, memoNotification: MemoNotification) {
-        val intent =
-            Intent(context.applicationContext, MemoNotificationReceiver::class.java).apply {
-                putExtra("NOTIFICATION", memoNotification)
-                putExtra("MEMO", memo)
-            }
+        val intent = Intent(
+            context.applicationContext,
+            MemoNotificationReceiver::class.java
+        ).apply {
+            putExtra("NOTIFICATION", memoNotification)
+            putExtra("MEMO", memo)
+        }
 
         val pendingIntent = PendingIntent.getBroadcast(
             context.applicationContext,
             memoNotification.notificationId,
             intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE
+                    or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val alarm = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarm = context.getSystemService(Context.ALARM_SERVICE)
+                as AlarmManager
 
         alarm.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP, memoNotification.date.timeInMillis, pendingIntent
+            AlarmManager.RTC_WAKEUP,
+            memoNotification.date.timeInMillis,
+            pendingIntent
         )
     }
 
@@ -134,7 +140,11 @@ class NotificationsScheduler(private val context: Context) {
         scheduleAlarm(memo, notification)
     }
 
-    suspend fun scheduleNextNotification(memo: Memo, memoNotification: MemoNotification, prediction: IPrediction) {
+    suspend fun scheduleNextNotification(
+        memo: Memo,
+        memoNotification: MemoNotification,
+        prediction: IPrediction,
+    ) {
         val updatedMemo = memoManager.fetchMemo(
             memo = memo,
         ) ?: return

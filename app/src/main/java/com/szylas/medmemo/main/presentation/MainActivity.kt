@@ -8,10 +8,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,10 +21,12 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -42,6 +46,7 @@ import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
 import com.szylas.medmemo.common.presentation.theme.imageBackground
+import com.szylas.medmemo.main.datastore.SharedPrefs
 import com.szylas.medmemo.main.presentation.models.CalendarScreen
 import com.szylas.medmemo.main.presentation.models.HomeScreen
 import com.szylas.medmemo.main.presentation.models.NavBarItem
@@ -49,6 +54,8 @@ import com.szylas.medmemo.main.presentation.models.StatisticsScreen
 import com.szylas.medmemo.main.presentation.views.CalendarFragment
 import com.szylas.medmemo.main.presentation.views.HomeFragment
 import com.szylas.medmemo.main.presentation.views.ProfileFragment
+import com.szylas.medmemo.main.presentation.views.SimpleHomeFragment
+import com.szylas.medmemo.main.presentation.views.SimpleProfileFragment
 import com.szylas.medmemo.memo.domain.managers.MemoManagerProvider
 import com.szylas.medmemo.memo.domain.notifications.NotificationsScheduler
 import com.szylas.medmemo.memo.domain.notifications.registerNotificationChannels
@@ -92,72 +99,128 @@ class MainActivity : ComponentActivity() {
 //        }, onSessionNotFound = { finish() })
 
 
-
         setContent {
-            MedMemoTheme {
-                val navController = rememberNavController()
+            val prefs by remember { mutableStateOf(SharedPrefs(this@MainActivity)) }
+            val simple by remember { mutableStateOf(prefs.getBool("Simplified UI")) }
+            Log.d("SimpleUI", simple.toString())
+            if (simple) {
+                SimpleUI()
+            } else {
+                ModernUI()
+            }
+        }
+    }
 
-                var selectedBottomIndex by rememberSaveable {
-                    mutableIntStateOf(0)
-                }
+    @Composable
+    private fun SimpleUI() {
 
-                // Loading active memos
-                lifecycleScope.loadActive(
-                    onSuccess = { memos.value = it },
-                    onError = { Toast.makeText(this, it, Toast.LENGTH_SHORT).show() },
-                    onSessionNotFound = {
-                        Toast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show()
-                        finish()
-                    }
-                )
-
-                Scaffold(
+        val navController = rememberNavController()
+        MedMemoTheme {
+            Scaffold(
+                modifier = Modifier
+                    .fillMaxSize(),
+            ) { innerPadding ->
+                registerNotificationChannels(this)
+                Box(
                     modifier = Modifier
-                        .fillMaxSize(),
-                    bottomBar = {
-                        NavigationBar(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp))
-                        ) {
-                            bottomNavItems.fastForEachIndexed { index, item ->
-                                NavigationBarItem(
-                                    selected = selectedBottomIndex == index,
-                                    onClick = {
-                                        selectedBottomIndex = index
-                                        navController.navigate(item.destination)
-                                    },
-                                    icon = {
-                                        Icon(
-                                            painter = painterResource(id = if (selectedBottomIndex == index) item.selectedIcon else item.unselectedIcon),
-                                            contentDescription = item.label
-                                        )
-                                    })
+                        .paint(
+                            imageBackground(),
+                            contentScale = ContentScale.FillBounds
+                        )
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                ) {
+                    NavHost(navController = navController, startDestination = HomeScreen) {
+                        composable<HomeScreen> {
+                            SimpleHomeFragment(activity = this@MainActivity) {
+                                navController.navigate(
+                                    it
+                                )
                             }
                         }
-                    },
+                        composable<StatisticsScreen> {
+                            SimpleProfileFragment(activity = this@MainActivity) {
+                                navController.navigate(
+                                    it
+                                )
+                            }
+                        }
+                    }
+
+
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun ModernUI() {
+        MedMemoTheme {
+            val navController = rememberNavController()
+
+            var selectedBottomIndex by rememberSaveable {
+                mutableIntStateOf(0)
+            }
+
+            // Loading active memos
+            lifecycleScope.loadActive(
+                onSuccess = { memos.value = it },
+                onError = { Toast.makeText(this, it, Toast.LENGTH_SHORT).show() },
+                onSessionNotFound = {
+                    Toast.makeText(this, "Not logged in!", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            )
+
+            Scaffold(
+                modifier = Modifier
+                    .fillMaxSize(),
+                bottomBar = {
+                    NavigationBar(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp))
+                    ) {
+                        bottomNavItems.fastForEachIndexed { index, item ->
+                            NavigationBarItem(
+                                selected = selectedBottomIndex == index,
+                                onClick = {
+                                    selectedBottomIndex = index
+                                    navController.navigate(item.destination)
+                                },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(
+                                            id = if (selectedBottomIndex == index) item.selectedIcon
+                                            else item.unselectedIcon
+                                        ),
+                                        contentDescription = item.label
+                                    )
+                                })
+                        }
+                    }
+                },
 
                 ) { innerPadding ->
-                    registerNotificationChannels(this)
-                    Box(
-                        modifier = Modifier
-                            .paint(
-                                imageBackground(),
-                                contentScale = ContentScale.FillBounds
-                            )
-                            .padding(innerPadding)
-                            .fillMaxSize()
-                    ) {
-                        NavHost(navController = navController, startDestination = HomeScreen) {
-                            composable<HomeScreen> {
-                                HomeFragment(memos = memos.value, activity = this@MainActivity)
-                            }
-                            composable<CalendarScreen> {
-                                CalendarFragment(memos = memos.value, activity = this@MainActivity)
-                            }
-                            composable<StatisticsScreen> {
-                                ProfileFragment(activity = this@MainActivity)
-                            }
+                registerNotificationChannels(this)
+                Box(
+                    modifier = Modifier
+                        .paint(
+                            imageBackground(),
+                            contentScale = ContentScale.FillBounds
+                        )
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                ) {
+                    NavHost(navController = navController, startDestination = HomeScreen) {
+                        composable<HomeScreen> {
+                            HomeFragment(memos = memos.value, activity = this@MainActivity)
+                        }
+                        composable<CalendarScreen> {
+                            CalendarFragment(memos = memos.value, activity = this@MainActivity)
+                        }
+                        composable<StatisticsScreen> {
+                            ProfileFragment(activity = this@MainActivity)
                         }
                     }
                 }
@@ -201,13 +264,6 @@ class MainActivity : ComponentActivity() {
         MemoManagerProvider.memoManager.loadActive(onSuccess, onError, onSessionNotFound)
     }
 
-    private fun CoroutineScope.updateEndless(
-        onSuccess: (Map<Memo, List<MemoNotification>>) -> Unit,
-        onError: (String) -> Unit,
-        onSessionNotFound: () -> Unit,
-    ) = launch {
-        MemoManagerProvider.memoManager.updateEndless(onSuccess, onError, onSessionNotFound)
-    }
 
 }
 

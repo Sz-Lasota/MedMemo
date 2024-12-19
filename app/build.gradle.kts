@@ -82,11 +82,17 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.google.firebase.analytics)
     implementation(libs.firebase.firestore)
+    implementation("androidx.compose.material:material-icons-extended:1.7.5")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    testImplementation("org.mockito:mockito-core:2.19.0")
+
+    testImplementation("org.powermock:powermock-module-junit4:1.7.3")
+    testImplementation("org.powermock:powermock-api-mockito2:1.7.3")
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation ("io.github.ehsannarmani:compose-charts:0.0.13")

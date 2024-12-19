@@ -1,5 +1,6 @@
-package com.szylas.medmemo.common.presentation
+package com.szylas.medmemo.main.presentation
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -18,10 +19,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -30,12 +38,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.szylas.medmemo.R
@@ -47,6 +59,7 @@ import com.szylas.medmemo.auth.domain.models.LoginCredentials
 import com.szylas.medmemo.common.domain.models.PrefItem
 import com.szylas.medmemo.common.presentation.components.TextInput
 import com.szylas.medmemo.common.presentation.theme.MedMemoTheme
+import com.szylas.medmemo.main.datastore.SharedPrefs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -59,12 +72,13 @@ class SettingsActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
+            val prefs by remember { mutableStateOf(SharedPrefs(this@SettingsActivity)) }
             var options by remember {
                 mutableStateOf(
                     listOf(
                         PrefItem(
                             name = "Simplified UI",
-                            value = false
+                            value = prefs.getBool("Simplified UI")
                         )
                     )
                 )
@@ -91,6 +105,7 @@ class SettingsActivity : ComponentActivity() {
                                 addAll(options)
                                 remove(item)
                                 add(PrefItem(item.name, !item.value))
+                                prefs.setBool(item.name, !item.value)
                             }.toList()
                         }
                     }
@@ -172,18 +187,49 @@ class SettingsActivity : ComponentActivity() {
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .padding(10.dp)
                 ) {
+                    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+                    var repeatPasswordVisible by rememberSaveable { mutableStateOf(false) }
+
                     Text("Change password", style = MaterialTheme.typography.titleLarge)
-                    TextInput(
+                    OutlinedTextField(
                         value = pass,
                         onValueChange = { pass = it },
-                        label = stringResource(R.string.new_password),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        label = { Text(text = stringResource(R.string.password)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            val image = if (passwordVisible)
+                                Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff
+                            val description = if (passwordVisible) "Hide password" else "Show password"
+
+                            IconButton(onClick = {passwordVisible = !passwordVisible}){
+                                Icon(imageVector  = image, description)
+                            }
+                        }
                     )
-                    TextInput(
+                    OutlinedTextField(
                         value = reapetPass,
                         onValueChange = { reapetPass = it },
-                        label = stringResource(R.string.repeat_password),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        visualTransformation = if (repeatPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        label = { Text(text = stringResource(R.string.repeatPassword)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            val image = if (repeatPasswordVisible)
+                                Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff
+                            val description = if (repeatPasswordVisible) "Hide password" else "Show password"
+
+                            IconButton(onClick = {repeatPasswordVisible = !repeatPasswordVisible}){
+                                Icon(imageVector  = image, description)
+                            }
+                        }
                     )
                     Button(
                         onClick = {
@@ -204,6 +250,26 @@ class SettingsActivity : ComponentActivity() {
                     }
                 }
             }
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .shadow(5.dp, RoundedCornerShape(14.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(10.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            startActivity(Intent(this@SettingsActivity, MainActivity::class.java))
+                            finish()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Confirm")
+                    }
+                }
+            }
         }
 
         if (emailModalShow) {
@@ -212,13 +278,29 @@ class SettingsActivity : ComponentActivity() {
 
             }) {
                 val auth = AuthManagerProvider.provide(AuthManagerConfiguration.FIREBASE)
+                var passwordVisible by rememberSaveable { mutableStateOf(false) }
                 Text("Enter password:")
-                TextInput(
+                OutlinedTextField(
                     value = authPass,
                     onValueChange = { authPass = it },
-                    label = stringResource(R.string.password),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true,
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    label = { Text(text = stringResource(R.string.password)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        val image = if (passwordVisible)
+                            Icons.Filled.Visibility
+                        else Icons.Filled.VisibilityOff
+                        val description = if (passwordVisible) "Hide password" else "Show password"
+
+                        IconButton(onClick = {passwordVisible = !passwordVisible}){
+                            Icon(imageVector  = image, description)
+                        }
+                    }
                 )
+
                 Button(
                     onClick = {
                         lifecycleScope.auth(
@@ -270,12 +352,27 @@ class SettingsActivity : ComponentActivity() {
 
             }) {
                 val auth = AuthManagerProvider.provide(AuthManagerConfiguration.FIREBASE)
+                var passwordVisible by rememberSaveable { mutableStateOf(false) }
                 Text("Enter password:")
-                TextInput(
+                OutlinedTextField(
                     value = authPass,
                     onValueChange = { authPass = it },
-                    label = stringResource(R.string.password),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true,
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    label = { Text(text = stringResource(R.string.password)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        val image = if (passwordVisible)
+                            Icons.Filled.Visibility
+                        else Icons.Filled.VisibilityOff
+                        val description = if (passwordVisible) "Hide password" else "Show password"
+
+                        IconButton(onClick = {passwordVisible = !passwordVisible}){
+                            Icon(imageVector  = image, description)
+                        }
+                    }
                 )
                 Button(
                     onClick = {

@@ -15,7 +15,9 @@ class FirebaseAuthConnector : IAuthConnector {
         onError: (String) -> Unit,
     ) {
         FirebaseAuth.getInstance()
-            .signInWithEmailAndPassword(credentials.eMail, credentials.password)
+            .signInWithEmailAndPassword(
+                credentials.eMail, credentials.password
+            )
             .addOnSuccessListener {
                 firestoreConnector.getUser(
                     credentials.eMail,
@@ -24,7 +26,9 @@ class FirebaseAuthConnector : IAuthConnector {
                 )
             }
             .addOnFailureListener {
-                onError(it.message ?: "Unknown error when logging in!")
+                onError(
+                    it.message ?: "Unknown error when logging in!"
+                )
             }
     }
 

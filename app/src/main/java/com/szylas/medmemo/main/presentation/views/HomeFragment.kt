@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,25 +30,100 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.szylas.medmemo.R
 import com.szylas.medmemo.common.domain.formatters.formatDate
 import com.szylas.medmemo.common.domain.formatters.formatTime
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.main.domain.getUpcomingNotifications
+import com.szylas.medmemo.main.presentation.models.StatisticsScreen
 import com.szylas.medmemo.memo.presentation.ManageMemoActivity
 import com.szylas.medmemo.memo.presentation.MemoTakenActivity
 import com.szylas.medmemo.memo.presentation.NewMemoActivity
 
 
 @Composable
+fun SimpleHomeFragment(activity: ComponentActivity, navigate: (Any) -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp), verticalArrangement = Arrangement.Center
+    ) {
+        Button(
+            onClick = {
+                activity.startActivity(
+                    Intent(
+                        activity, NewMemoActivity::class.java
+                    )
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(90.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .padding(10.dp)
+        ) {
+            Text(
+                stringResource(id = R.string.new_memo),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Button(
+            onClick = { activity.startActivity(Intent(activity, UpcomingNotificationsActivity::class.java)) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(90.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .padding(10.dp)
+        ) {
+            Text(
+                "Today notifications",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Button(
+            onClick = { activity.startActivity(Intent(activity, ManageMemoActivity::class.java)) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(90.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .padding(10.dp)
+        ) {
+            Text(
+                "Manage Memos",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Button(
+            onClick = { navigate(StatisticsScreen) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(90.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .padding(10.dp)
+        ) {
+            Text(
+                "Profile", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold
+            )
+        }
+
+    }
+}
+
+@Composable
 fun HomeFragment(memos: List<Memo>?, activity: ComponentActivity) {
     if (memos == null) {
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -88,8 +164,7 @@ fun HomeFragment(memos: List<Memo>?, activity: ComponentActivity) {
                     .clickable {
                         activity.startActivity(
                             Intent(
-                                activity,
-                                NewMemoActivity::class.java
+                                activity, NewMemoActivity::class.java
                             )
                         )
                     },
@@ -101,8 +176,7 @@ fun HomeFragment(memos: List<Memo>?, activity: ComponentActivity) {
                     contentDescription = stringResource(id = R.string.new_memo)
                 )
                 Text(
-                    text = stringResource(id = R.string.new_memo),
-                    textAlign = TextAlign.Center
+                    text = stringResource(id = R.string.new_memo), textAlign = TextAlign.Center
                 )
             }
         }
@@ -197,8 +271,7 @@ fun ManageMemoBlock(activity: ComponentActivity, memos: List<Memo>, modifier: Mo
                 .fillMaxWidth()
                 .clickable {
                     activity.startActivity(Intent(activity, ManageMemoActivity::class.java))
-                },
-            horizontalArrangement = Arrangement.Center
+                }, horizontalArrangement = Arrangement.Center
         ) {
             Text(
                 text = stringResource(R.string.see_more),
@@ -217,10 +290,8 @@ fun MemoItem(memo: Memo, modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = if (memo.finishDate == null) stringResource(R.string.endless) else stringResource(
-                R.string.ends_on,
-                formatDate(memo.finishDate!!)
-            ),
-            style = MaterialTheme.typography.labelLarge
+                R.string.ends_on, formatDate(memo.finishDate!!)
+            ), style = MaterialTheme.typography.labelLarge
         )
     }
 }

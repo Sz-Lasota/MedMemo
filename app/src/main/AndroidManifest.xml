@@ -66,9 +66,14 @@
             android:label="@string/pillamount"
             android:theme="@style/Theme.MedMemo" />
         <activity
-            android:name=".common.presentation.SettingsActivity"
+            android:name=".main.presentation.SettingsActivity"
             android:exported="false"
             android:label="@string/settings"
+            android:theme="@style/Theme.MedMemo" />
+        <activity
+            android:name=".main.presentation.views.UpcomingNotificationsActivity"
+            android:exported="false"
+            android:label="@string/upcoming_notifications_man"
             android:theme="@style/Theme.MedMemo" />
 
         <receiver

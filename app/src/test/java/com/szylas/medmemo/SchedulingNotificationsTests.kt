@@ -1,4 +1,4 @@
-package com.example.medmemo
+package com.szylas.medmemo
 
 import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.memo.domain.predictions.WeightedAveragePrediction
@@ -7,7 +7,7 @@ import org.junit.Test
 import org.junit.Assert.*
 import java.util.Calendar
 
-class SchedulingNotifications {
+class SchedulingNotificationsTests {
 
     @Test
     fun schedulingNotification_notEnoughData() {
@@ -27,25 +27,63 @@ class SchedulingNotifications {
     fun schedulingNotification_correctReshedule15MinLater() {
         val prediction = WeightedAveragePrediction()
         val baseTime = 640
-        val notification = MemoNotification(baseDosageTime = baseTime, date = Calendar.getInstance().apply { timeInMillis = 1733641200000 })
-
-        val notificationHistory = listOf(
-            MemoNotification(date = Calendar.getInstance().apply { timeInMillis = 1733036400000 }, intakeTime = Calendar.getInstance().apply { timeInMillis = 1733037300000 }),
-            MemoNotification(date = Calendar.getInstance().apply { timeInMillis = 1733122800000 }, intakeTime = Calendar.getInstance().apply { timeInMillis = 1733122800000 }),
-            MemoNotification(date = Calendar.getInstance().apply { timeInMillis = 1733209200000 }, intakeTime = Calendar.getInstance().apply { timeInMillis = 1733209200000 }),
-            MemoNotification(date = Calendar.getInstance().apply { timeInMillis = 1733295600000 }, intakeTime = Calendar.getInstance().apply { timeInMillis = 1733295600000 }),
-            MemoNotification(date = Calendar.getInstance().apply { timeInMillis = 1733382000000 }, intakeTime = Calendar.getInstance().apply { timeInMillis = 1733382000000 }),
-            MemoNotification(date = Calendar.getInstance().apply { timeInMillis = 1733468400000 }, intakeTime = Calendar.getInstance().apply { timeInMillis = 1733468400000 }),
-            MemoNotification(date = Calendar.getInstance().apply { timeInMillis = 1733554800000 }, intakeTime = Calendar.getInstance().apply { timeInMillis = 1733554800000 }),
+        val expected = 8 * 60 + 15
+        val notification = MemoNotification(
+            baseDosageTime = baseTime,
+            date = Calendar.getInstance()
+                .apply { timeInMillis = 1733641200000 }
+        )
+        val history = listOf(
+            MemoNotification(
+                date = Calendar.getInstance()
+                    .apply { timeInMillis = 1733036400000 },
+                intakeTime = Calendar.getInstance()
+                    .apply { timeInMillis = 1733037300000 }
+            ),
+            MemoNotification(
+                date = Calendar.getInstance()
+                    .apply { timeInMillis = 1733122800000 },
+                intakeTime = Calendar.getInstance()
+                    .apply { timeInMillis = 1733122800000 }
+            ),
+            MemoNotification(
+                date = Calendar.getInstance()
+                    .apply { timeInMillis = 1733209200000 },
+                intakeTime = Calendar.getInstance()
+                    .apply { timeInMillis = 1733209200000 }
+            ),
+            MemoNotification(
+                date = Calendar.getInstance()
+                    .apply { timeInMillis = 1733295600000 },
+                intakeTime = Calendar.getInstance()
+                    .apply { timeInMillis = 1733295600000 }
+            ),
+            MemoNotification(
+                date = Calendar.getInstance()
+                    .apply { timeInMillis = 1733382000000 },
+                intakeTime = Calendar.getInstance()
+                    .apply { timeInMillis = 1733382000000 }
+            ),
+            MemoNotification(
+                date = Calendar.getInstance()
+                    .apply { timeInMillis = 1733468400000 },
+                intakeTime = Calendar.getInstance()
+                    .apply { timeInMillis = 1733468400000 }
+            ),
+            MemoNotification(
+                date = Calendar.getInstance()
+                    .apply { timeInMillis = 1733554800000 },
+                intakeTime = Calendar.getInstance()
+                    .apply { timeInMillis = 1733554800000 }
+            ),
         )
 
         val actual = prediction.predict(
             notification,
-            notificationHistory
+            history
         )
 
-        assertEquals(8*60+15, actual)
-
+        assertEquals(expected, actual)
     }
 
     @Test

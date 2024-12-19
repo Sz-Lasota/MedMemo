@@ -1,12 +1,9 @@
 package com.szylas.medmemo.memo.domain.managers
 
-import android.util.Log
-import androidx.core.text.toSpannable
 import com.szylas.medmemo.auth.domain.Session
 import com.szylas.medmemo.common.domain.models.Memo
 import com.szylas.medmemo.common.domain.models.MemoNotification
 import com.szylas.medmemo.memo.datastore.IMemoRepository
-import com.szylas.medmemo.memo.domain.extensions.updateEndless
 
 class MemoManager(
     private val saver: IMemoRepository,
@@ -77,28 +74,7 @@ class MemoManager(
         saver.loadActive(user, onSuccess, onError)
     }
 
-    suspend fun updateEndless(
-        onSuccess: (Map<Memo, List<MemoNotification>>) -> Unit,
-        onError: (String) -> Unit,
-        onSessionNotFound: () -> Unit,
-    ) {
-        val user = Session.user()
-        if (user == null) {
-            onSessionNotFound()
-            return
-        }
 
-        val memos = saver.loadActiveAndEndless(user, onError)
-        val newNotifications: MutableMap<Memo, List<MemoNotification>> = mutableMapOf()
-        memos.forEach { memo ->
-            newNotifications[memo] = memo.updateEndless()
-            if (newNotifications[memo]?.isEmpty() != true) {
-                saver.updateMemo(memo, user, { Log.d("Updated memo", memo.name) }, onError)
-            }
-        }
-
-        onSuccess(newNotifications)
-    }
 
     suspend fun fetchMemo(
         memo: Memo,
